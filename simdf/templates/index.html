@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="{{ ui_settings.language if ui_settings and ui_settings.language else 'es' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body data-language="{{ ui_settings.language if ui_settings and ui_settings.language else 'es' }}" class="{{ 'theme-dark' if ui_settings and ui_settings.theme == 'dark' else 'theme-light' }} {{ 'ui-size-comfortable' if ui_settings and ui_settings.interface_size == 'comfortable' else 'ui-size-compact' }} {{ 'login-page' if page == 'login' else 'history-page' if page == 'history' else '' }}">
+{% if page == 'login' %}
+<main class="page-shell login-shell">
+    <section class="login-stage">
+        <article class="login-brand-block">
+            <p class="login-welcome">WELCOME TO</p>
+            <div class="login-brand-logo-wrap">
+                <img class="login-brand-logo" src="{{ url_for('static', filename='css/images/logo2.png') }}" alt="Logo SIMDF">
+            </div>
+            <h1 class="login-brand-title">SIMDF</h1>
+            <p class="login-brand-subtitle">Sistema Interno de Monitoreo y Detección de Fraude</p>
+        </article>
+
+        <article class="login-glass-card">
+            <p class="eyebrow">ACCESO SEGURO</p>
+            <h2 class="auth-form-title">Iniciar sesión</h2>
+            <p class="subtitle auth-form-subtitle">Ingresa tus credenciales corporativas</p>
+
+            {% if error %}
+                <p class="status error-status auth-error"><i class="bi bi-exclamation-triangle-fill"></i> {{ error }}</p>
+            {% endif %}
+
+            <form action="{{ url_for('login') }}" method="post" class="form-grid" data-auth-login="true" data-loading-text="Validando acceso...">
+                <label for="username">Usuario</label>
+                <div class="auth-input-wrap">
+                    <span class="auth-input-icon" aria-hidden="true"><i class="bi bi-person"></i></span>
+                    <input id="username" type="text" name="username" placeholder="Ej: analista" required>
+                </div>
+
+                <label for="password">Contraseña</label>
+                <div class="auth-input-wrap auth-input-wrap-password">
+                    <span class="auth-input-icon" aria-hidden="true"><i class="bi bi-lock"></i></span>
+                    <input id="password" type="password" name="password" placeholder="••••••••" required>
+                    <button type="button" class="password-toggle" data-password-toggle="password" aria-label="Mostrar contraseña" title="Mostrar contraseña">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+
+                <button type="submit">LOGIN</button>
+            </form>
+
+            <section class="auth-inline-actions">
+                <p class="auth-inline-text">¿No tienes cuenta?</p>
+                <a class="auth-inline-link" href="{{ url_for('register') }}">Crear cuenta</a>
+            </section>
+            <section class="auth-inline-actions">
+                <p class="auth-inline-text">¿Olvidaste tu contraseña?</p>
+                <a class="auth-inline-link" href="{{ url_for('forgot_password') }}">Recuperar contraseña</a>
+            </section>
+
+            <article class="hint-box compact-hint login-hint">
+                <p class="kpi-label">Accesos demo</p>
+                <p class="hint-text">Analista: analista / analista123</p>
+                <p class="hint-text">Administrador: admin / admin123</p>
+            </article>
+        </article>
+    </section>
+</main>
+{% elif page == 'register' %}
+<main class="page-shell login-shell">
+    <section class="login-stage">
+        <article class="login-brand-block">
+            <p class="login-welcome">WELCOME TO</p>
+            <div class="login-brand-logo-wrap">
+                <img class="login-brand-logo" src="{{ url_for('static', filename='css/images/logo2.png') }}" alt="Logo SIMDF">
+            </div>
+            <h1 class="login-brand-title">SIMDF</h1>
+            <p class="login-brand-subtitle">Sistema Interno de Monitoreo y Detección de Fraude</p>
+        </article>
+
+        <article class="login-glass-card">
+            <p class="eyebrow">NUEVA CUENTA</p>
+            <h2 class="auth-form-title">Crear cuenta</h2>
+            <p class="subtitle auth-form-subtitle">Registra un usuario analista para operar en la plataforma</p>
+
+            {% if error %}
+                <p class="status error-status auth-error"><i class="bi bi-exclamation-triangle-fill"></i> {{ error }}</p>
+            {% endif %}
+            {% if notice %}
+                <p class="status">{{ notice }}</p>
+            {% endif %}
+
+            <form action="{{ url_for('register') }}" method="post" class="form-grid">
+                <label for="full_name">Nombre completo</label>
+                <div class="auth-input-wrap">
+                    <span class="auth-input-icon" aria-hidden="true"><i class="bi bi-card-text"></i></span>
+                    <input id="full_name" type="text" name="full_name" placeholder="Ej: Camila Pérez">
+                </div>
+
+                <label for="username">Usuario</label>
+                <div class="auth-input-wrap">
+                    <span class="auth-input-icon" aria-hidden="true"><i class="bi bi-person"></i></span>
+                    <input id="username" type="text" name="username" placeholder="Ej: camila" pattern="[A-Za-z0-9_.-]{3,32}" minlength="3" maxlength="32" required>
+                </div>
+
+                <label for="email">Correo corporativo</label>
+                <div class="auth-input-wrap">
+                    <span class="auth-input-icon" aria-hidden="true"><i class="bi bi-envelope"></i></span>
+                    <input id="email" type="email" name="email" placeholder="usuario@empresa.com" required>
+                </div>
+
+                <label for="password">Contraseña</label>
+                <div class="auth-input-wrap auth-input-wrap-password">
+                    <span class="auth-input-icon" aria-hidden="true"><i class="bi bi-lock"></i></span>
+                    <input id="password" type="password" name="password" placeholder="Mínimo 8 caracteres" minlength="8" required>
+                    <button type="button" class="password-toggle" data-password-toggle="password" aria-label="Mostrar contraseña" title="Mostrar contraseña">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+
+                <label for="confirm_password">Confirmar contraseña</label>
+                <div class="auth-input-wrap auth-input-wrap-password">
+                    <span class="auth-input-icon" aria-hidden="true"><i class="bi bi-shield-lock"></i></span>
+                    <input id="confirm_password" type="password" name="confirm_password" placeholder="Repite tu contraseña" minlength="8" required>
+                    <button type="button" class="password-toggle" data-password-toggle="confirm_password" aria-label="Mostrar contraseña" title="Mostrar contraseña">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+
+                <p class="subtitle">La contraseña debe incluir mayúscula, minúscula, número y carácter especial.</p>
+
+                <button type="submit">Crear cuenta</button>
+            </form>
+
+            <section class="auth-inline-actions auth-inline-actions-single">
+                <a class="auth-inline-link" href="{{ url_for('login') }}">Volver al login</a>
+            </section>
+        </article>
+    </section>
+</main>
+{% elif page == 'forgot_password' %}
+<main class="page-shell login-shell">
+    <section class="login-stage">
+        <article class="login-brand-block">
+            <p class="login-welcome">WELCOME TO</p>
+            <div class="login-brand-logo-wrap">
+                <img class="login-brand-logo" src="{{ url_for('static', filename='css/images/logo2.png') }}" alt="Logo SIMDF">
+            </div>
+            <h1 class="login-brand-title">SIMDF</h1>
+            <p class="login-brand-subtitle">Sistema Interno de Monitoreo y Detección de Fraude</p>
+        </article>
+
+        <article class="login-glass-card">
+            <p class="eyebrow">RECUPERACIÓN</p>
+            <h2 class="auth-form-title">¿Olvidaste tu contraseña?</h2>
+            <p class="subtitle auth-form-subtitle">Valida usuario y correo para restablecer el acceso</p>
+
+            {% if error %}
+                <p class="status error-status auth-error"><i class="bi bi-exclamation-triangle-fill"></i> {{ error }}</p>
+            {% endif %}
+            {% if notice %}
+                <p class="status">{{ notice }}</p>
+            {% endif %}
+
+            <form action="{{ url_for('forgot_password') }}" method="post" class="form-grid">
+                <label for="username">Usuario</label>
+                <div class="auth-input-wrap">
+                    <span class="auth-input-icon" aria-hidden="true"><i class="bi bi-person"></i></span>
+                    <input id="username" type="text" name="username" placeholder="Ej: analista" required>
+                </div>
+
+                <label for="email">Correo corporativo</label>
+                <div class="auth-input-wrap">
+                    <span class="auth-input-icon" aria-hidden="true"><i class="bi bi-envelope"></i></span>
+                    <input id="email" type="email" name="email" placeholder="usuario@empresa.com" required>
+                </div>
+
+                <label for="new_password">Nueva contraseña</label>
+                <div class="auth-input-wrap auth-input-wrap-password">
+                    <span class="auth-input-icon" aria-hidden="true"><i class="bi bi-lock"></i></span>
+                    <input id="new_password" type="password" name="new_password" placeholder="Mínimo 8 caracteres" minlength="8" required>
+                    <button type="button" class="password-toggle" data-password-toggle="new_password" aria-label="Mostrar contraseña" title="Mostrar contraseña">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+
+                <label for="confirm_password">Confirmar nueva contraseña</label>
+                <div class="auth-input-wrap auth-input-wrap-password">
+                    <span class="auth-input-icon" aria-hidden="true"><i class="bi bi-shield-lock"></i></span>
+                    <input id="confirm_password" type="password" name="confirm_password" placeholder="Repite tu contraseña" minlength="8" required>
+                    <button type="button" class="password-toggle" data-password-toggle="confirm_password" aria-label="Mostrar contraseña" title="Mostrar contraseña">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+
+                <p class="subtitle">La contraseña debe incluir mayúscula, minúscula, número y carácter especial.</p>
+
+                <button type="submit">Restablecer contraseña</button>
+            </form>
+
+            <section class="auth-inline-actions auth-inline-actions-single">
+                <a class="auth-inline-link" href="{{ url_for('login') }}">Volver al login</a>
+            </section>
+        </article>
+    </section>
+</main>
+{% elif page == 'result' %}
+    {% if clase == 'alto' %}
+    <section class="app-toast app-toast--alert" data-toast data-toast-duration="5200" role="status" aria-live="polite">
+        <p class="app-toast__message">🔴 Alerta: Transacción sospechosa detectada</p>
+        <button class="app-toast__close" type="button" aria-label="Cerrar notificación" data-toast-close>×</button>
+    </section>
+    {% endif %}
+    <main class="page-shell">
+        <section class="card {{ clase }}">
+            <div class="topbar">
+                <div class="brand-mini">
+                    <img class="brand-mini-logo" src="{{ url_for('static', filename='css/images/logo2.png') }}" alt="Logo SIMDF">
+                    <div>
+                        <p class="brand-mini-title">SIMDF</p>
+                        <p class="brand-mini-sub">Análisis de Riesgo</p>
+                    </div>
+                </div>
+                <p class="user-chip">{{ current_user.username }} · {{ current_user.role }}</p>
+                <div class="topbar-links">
+                    <a class="back-link" href="{{ url_for('my_profile') }}">Mi perfil</a>
+                    <a class="back-link" href="{{ url_for('history') }}">Historial</a>
+                    {% if current_user.role == 'administrador' %}
+                        <a class="back-link" href="{{ url_for('system_logs_page') }}">Logs</a>
+                    {% endif %}
+                    <a class="back-link" href="{{ url_for('logout') }}">Cerrar sesión</a>
+                </div>
+            </div>
+
+            <p class="eyebrow">RESULTADO DEL ANALISIS</p>
+            <h1>Resultado Inteligente</h1>
+            <p class="subtitle">Evaluación profesional de riesgo transaccional</p>
+            <p class="model-used">Modelo utilizado: <strong>{{ selected_model_label }}</strong></p>
+
+            <article class="intelligence-box {{ clase }}">
+                <p class="risk-level">
+                    {% if clase == 'alto' %}
+                        <span class="risk-traffic risk-traffic-alto">🔴 Alto</span>
+                    {% elif clase == 'medio' %}
+                        <span class="risk-traffic risk-traffic-medio">🟡 Medio</span>
+                    {% else %}
+                        <span class="risk-traffic risk-traffic-bajo">🟢 Bajo</span>
+                    {% endif %}
+                    {{ nivel_riesgo }}
+                </p>
+                <div class="intelligence-grid">
+                    <div class="intel-item">
+                        <p class="kpi-label">Probabilidad de fraude</p>
+                        <p class="intel-value">{{ probabilidad_fraude }}%</p>
+                    </div>
+                    <div class="intel-item">
+                        <p class="kpi-label">Recomendación automática</p>
+                        <p class="intel-value">{{ recomendacion }}</p>
+                    </div>
+                </div>
+                <div class="risk-meter-wrap">
+                    <p class="risk-meter-label">Riesgo: {{ probabilidad_fraude }}%</p>
+                    <progress class="risk-meter risk-fill-{{ clase }}" max="100" value="{{ probabilidad_fraude }}"></progress>
+                    <p class="risk-meter-value">{{ probabilidad_fraude }}%</p>
+                </div>
+            </article>
+
+            <div class="kpi-grid">
+                <article class="kpi"><p class="kpi-label">Monto (USD)</p><p class="kpi-value">{{ format_usd(monto) }}</p></article>
+                <article class="kpi"><p class="kpi-label">Tipo de comercio</p><p class="kpi-value">{{ tipo_comercio }}</p></article>
+                <article class="kpi"><p class="kpi-label">Metodo de pago</p><p class="kpi-value">{{ metodo_pago }}</p></article>
+                <article class="kpi"><p class="kpi-label">Ubicacion</p><p class="kpi-value">{{ ubicacion }}</p></article>
+                <article class="kpi"><p class="kpi-label">Frecuencia</p><p class="kpi-value">{{ "%.2f"|format(frecuencia) }}</p></article>
+                <article class="kpi"><p class="kpi-label">Hora</p><p class="kpi-value">{{ "%.2f"|format(hora) }}</p></article>
+            </div>
+
+            <article class="score-box">
+                <p class="kpi-label">Score de riesgo
+                    <span class="ui-tooltip" tabindex="0" aria-label="Información sobre score de riesgo">🛈
+                        <span class="ui-tooltip-text">El score de riesgo representa la probabilidad estimada por el modelo.</span>
+                    </span>
+                </p>
+                <p class="score-value">{{ "%.2f"|format(score) }}</p>
+            </article>
+
+            <article class="panel-card model-compare-panel">
+                <div class="panel-head"><p class="eyebrow">COMPARACIÓN</p><p class="panel-title">Resultado por modelo</p></div>
+                <div class="model-compare-grid">
+                    {% for item in model_comparison %}
+                    <div class="metric-card">
+                        <p class="kpi-label">{{ item.model_label }}</p>
+                        <p class="metric-value">{{ item.probabilidad_fraude }}%</p>
+                        <p class="subtitle">{{ item.nivel_riesgo }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <a class="back-link" href="{{ url_for('home') }}">Volver al tablero</a>
+        </section>
+    </main>
+{% else %}
+<main class="dashboard-page">
+    <nav class="top-navbar">
+        <a class="top-nav-link" href="{{ url_for('home') }}"><i class="bi bi-house-door"></i> Inicio</a>
+        <a class="top-nav-link" href="{{ url_for('home') }}"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+        <a class="top-nav-link" href="{{ url_for('history') }}"><i class="bi bi-clock-history"></i> Historial</a>
+        <a class="top-nav-link" href="{{ url_for('about_page') }}"><i class="bi bi-info-circle"></i> Acerca de</a>
+        {% if current_user.role == 'administrador' %}
+            <a class="top-nav-link" href="{{ url_for('user_management') }}"><i class="bi bi-shield-lock"></i> Admin</a>
+        {% else %}
+            <a class="top-nav-link" href="{{ url_for('my_profile') }}"><i class="bi bi-person-badge"></i> Mi perfil</a>
+        {% endif %}
+        <a class="top-nav-link top-nav-link-exit" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
+    </nav>
+
+    <header class="dashboard-header">
+        <div class="header-brand">
+            <img class="header-logo" src="{{ url_for('static', filename='css/images/logo2.png') }}" alt="Logo SIMDF">
+            <div>
+                <h1 class="header-title">SIMDF</h1>
+                <p class="header-subtitle">Sistema Interno de Monitoreo y Detección de Fraude</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <p class="user-chip">{{ current_user.username }} · {{ current_user.role }}</p>
+            <p class="header-nav-hint">Navega desde el menú lateral</p>
+        </div>
+    </header>
+
+    <section class="dashboard-layout">
+        <aside class="dashboard-sidebar">
+            <p class="sidebar-title">Menú</p>
+            <a class="sidebar-link {{ 'active' if page == 'dashboard' else '' }}" href="{{ url_for('home') }}"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+            <a class="sidebar-link {{ 'active' if page == 'model_metrics' else '' }}" href="{{ url_for('model_metrics_page') }}"><i class="bi bi-graph-up-arrow"></i> Métricas del modelo</a>
+            <a class="sidebar-link {{ 'active' if page == 'history' else '' }}" href="{{ url_for('history') }}"><i class="bi bi-clock-history"></i> Historial</a>
+            <a class="sidebar-link {{ 'active' if page == 'explainability' else '' }}" href="{{ url_for('explainability_page') }}"><i class="bi bi-lightbulb"></i> Explicabilidad</a>
+            <a class="sidebar-link {{ 'active' if page == 'about' else '' }}" href="{{ url_for('about_page') }}"><i class="bi bi-info-circle"></i> Acerca de</a>
+            <a class="sidebar-link {{ 'active' if page == 'profile' else '' }}" href="{{ url_for('my_profile') }}"><i class="bi bi-person-circle"></i> Mi perfil</a>
+            {% if current_user.role == 'administrador' %}
+                <p class="sidebar-title admin-menu-title">Admin Studio</p>
+                <a class="sidebar-link {{ 'active' if page == 'user_management' else '' }}" href="{{ url_for('user_management') }}"><i class="bi bi-people"></i> Gestión de usuarios</a>
+                <a class="sidebar-link {{ 'active' if page == 'model_management' else '' }}" href="{{ url_for('model_management') }}"><i class="bi bi-cpu"></i> Gestión de modelo</a>
+                <a class="sidebar-link {{ 'active' if page == 'data_management' else '' }}" href="{{ url_for('data_management') }}"><i class="bi bi-database-gear"></i> Gestión de datos</a>
+                <a class="sidebar-link {{ 'active' if page == 'system_security' else '' }}" href="{{ url_for('system_security_page') }}"><i class="bi bi-shield-lock"></i> Seguridad del sistema</a>
+                <a class="sidebar-link sidebar-link-gear {{ 'active' if page == 'system_config' else '' }}" href="{{ url_for('system_config') }}"><span class="gear-glyph" aria-hidden="true">⚙</span> Configuración</a>
+                <a class="sidebar-link {{ 'active' if page == 'system_logs' else '' }}" href="{{ url_for('system_logs_page') }}"><i class="bi bi-journal-text"></i> Logs del sistema</a>
+            {% else %}
+                <a class="sidebar-link sidebar-link-gear {{ 'active' if page == 'analyst_config' else '' }}" href="{{ url_for('analyst_config_page') }}"><span class="gear-glyph" aria-hidden="true">⚙</span> Configuración del Analista</a>
+            {% endif %}
+            <a class="sidebar-link" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> Salir</a>
+        </aside>
+
+        <section class="dashboard-main">
+            <div class="module-banner">
+                <p class="module-eyebrow">{{ module_eyebrow }}</p>
+                <h2 class="module-title">{{ module_title }}</h2>
+            </div>
+
+            {% if page == 'dashboard' %}
+            <div class="dashboard-actions-top">
+                <button type="button" id="dashboardClearBtn" class="secondary-button" aria-label="Limpiar datos del dashboard">
+                    <i class="bi bi-trash" aria-hidden="true"></i> Limpiar datos
+                </button>
+            </div>
+            <article class="summary-grid" id="dashboard">
+                <div class="summary-card"><p class="summary-label"><i class="fa-solid fa-chart-column summary-icon" aria-hidden="true"></i>Transacciones Analizadas</p><p class="summary-value">{{ total_analizadas }}</p></div>
+                <div class="summary-card"><p class="summary-label"><i class="fa-solid fa-triangle-exclamation summary-icon" aria-hidden="true"></i>Fraude Detectado</p><p class="summary-value">{{ fraude_detectado }}%</p></div>
+                <div class="summary-card"><p class="summary-label"><i class="fa-solid fa-shield-halved summary-icon" aria-hidden="true"></i>Riesgo Promedio</p><p class="summary-value risk-chip {{ 'chip-alto' if riesgo_promedio == 'ALTO' else 'chip-medio' if riesgo_promedio == 'MEDIO' else 'chip-bajo' }}">{{ riesgo_promedio }}</p></div>
+                <div class="summary-card"><p class="summary-label"><i class="fa-solid fa-bell summary-icon" aria-hidden="true"></i>Alertas 24h</p><p class="summary-value">{{ alertas_hoy }}</p></div>
+            </article>
+
+            <section class="panel-grid system-security-grid">
+                <article class="panel-card risk-hero {{ riesgo_destacado.class }}">
+                    <div class="panel-head"><p class="eyebrow">NIVEL DE RIESGO</p><p class="panel-title">Indicador principal</p></div>
+                    <p class="risk-hero-title">{{ riesgo_destacado.texto }}</p>
+                    <p class="risk-hero-prob">{{ riesgo_destacado.probabilidad }}% de probabilidad de fraude</p>
+                    <p class="risk-hero-traffic">
+                        {% if 'alto' in riesgo_destacado.texto|lower %}
+                            <span class="risk-traffic risk-traffic-alto">🔴 Alto</span>
+                        {% elif 'medio' in riesgo_destacado.texto|lower %}
+                            <span class="risk-traffic risk-traffic-medio">🟡 Medio</span>
+                        {% else %}
+                            <span class="risk-traffic risk-traffic-bajo">🟢 Bajo</span>
+                        {% endif %}
+                    </p>
+                    <div class="risk-meter-wrap compact">
+                        <p class="risk-meter-label">Riesgo: {{ riesgo_destacado.probabilidad }}%</p>
+                        {% if 'alto' in riesgo_destacado.texto|lower %}
+                            <progress class="risk-meter risk-fill-alto" max="100" value="{{ riesgo_destacado.probabilidad }}"></progress>
+                        {% elif 'medio' in riesgo_destacado.texto|lower %}
+                            <progress class="risk-meter risk-fill-medio" max="100" value="{{ riesgo_destacado.probabilidad }}"></progress>
+                        {% else %}
+                            <progress class="risk-meter risk-fill-bajo" max="100" value="{{ riesgo_destacado.probabilidad }}"></progress>
+                        {% endif %}
+                    </div>
+                    <p class="risk-hero-rec">Recomendación: {{ riesgo_destacado.recomendacion }}</p>
+                </article>
+                <article class="panel-card trend-panel">
+                    <div class="panel-head"><p class="eyebrow">GRÁFICA</p><p class="panel-title">Tendencia de fraude (últimas evaluaciones)</p></div>
+                    <div class="trend-chart">
+                        {% if ultimas_probabilidades and ultimas_probabilidades|length > 0 %}
+                            <canvas
+                                id="riskTrendChart"
+                                class="trend-chart-canvas"
+                                data-probabilities='{{ ultimas_probabilidades|tojson }}'
+                                aria-label="Tendencia de riesgo de fraude"
+                                role="img"
+                            ></canvas>
+                        {% else %}
+                            <p class="trend-empty">Sin datos para graficar todavía.</p>
+                        {% endif %}
+                    </div>
+                </article>
+            </section>
+
+            <article class="panel-card fraud-map-panel">
+                <div class="panel-head"><p class="eyebrow">MAPA DE FRAUDE</p><p class="panel-title">Fraude por ubicación</p></div>
+                <div class="fraud-map-layout">
+                    {% if fraud_by_location and fraud_by_location|length > 0 %}
+                        <div class="fraud-location-list" role="list" aria-label="Eventos de riesgo por ubicación">
+                            {% for item in fraud_by_location %}
+                            <article class="fraud-location-item" role="listitem">
+                                <div class="fraud-location-top">
+                                    <p class="fraud-location-city">📍 {{ item.city }}</p>
+                                    <p class="fraud-location-alerts">{{ item.alerts }} eventos</p>
+                                </div>
+                                <div class="fraud-bar-track">
+                                    <span class="fraud-bar-fill {{ item.bar_class }}"></span>
+                                </div>
+                            </article>
+                            {% endfor %}
+                        </div>
+                        <div id="fraudRealMap" class="fraud-real-map" data-map-points='{{ fraud_map_points|tojson }}' aria-label="Mapa real de eventos de riesgo por ciudad"></div>
+                    {% else %}
+                        <p class="status">No hay eventos de riesgo con ubicación geográfica suficiente para mapear.</p>
+                    {% endif %}
+                </div>
+            </article>
+
+            <section class="panel-grid">
+                <article class="panel-card risk-distribution-panel">
+                    <div class="panel-head"><p class="eyebrow">DISTRIBUCIÓN DE RIESGO</p><p class="panel-title">Clasificación del modelo</p></div>
+                    <div class="risk-distribution-wrap">
+                        <canvas
+                            id="riskDistributionChart"
+                            data-risk-distribution='{{ risk_distribution|tojson }}'
+                            aria-label="Distribución de riesgo"
+                            role="img"
+                        ></canvas>
+                    </div>
+                </article>
+
+                <article class="panel-card fraud-time-panel">
+                    <div class="panel-head"><p class="eyebrow">TENDENCIA DE FRAUDE</p><p class="panel-title">Fraude por día, semana y mes</p></div>
+                    <div class="fraud-time-controls" role="tablist" aria-label="Frecuencia de tendencia">
+                        <button type="button" class="fraud-time-btn is-active" data-trend-range="day">Día</button>
+                        <button type="button" class="fraud-time-btn" data-trend-range="week">Semana</button>
+                        <button type="button" class="fraud-time-btn" data-trend-range="month">Mes</button>
+                    </div>
+                    <div class="trend-chart">
+                        <canvas
+                            id="fraudTimeChart"
+                            data-fraud-trend='{{ fraud_trend_series|tojson }}'
+                            aria-label="Tendencia de fraude por tiempo"
+                            role="img"
+                        ></canvas>
+                    </div>
+                </article>
+            </section>
+
+            <article class="panel-card quick-action-panel">
+                <div class="panel-head"><p class="eyebrow">ACCIÓN RÁPIDA</p><p class="panel-title">Atajos del analista</p></div>
+                <div class="quick-action-grid">
+                    <a class="quick-action-btn" href="{{ url_for('history') }}">📊 Ver reporte completo</a>
+                </div>
+            </article>
+
+            <article class="panel-card">
+                <div class="panel-head"><p class="eyebrow">MÓDULOS</p><p class="panel-title">Acceso rápido por pestañas</p></div>
+                <div class="quick-links-grid">
+                    <a class="quick-link-card" href="{{ url_for('model_metrics_page') }}">Métricas del modelo</a>
+                    <a class="quick-link-card" href="{{ url_for('history') }}">Historial</a>
+                    <a class="quick-link-card" href="{{ url_for('explainability_page') }}">Explicabilidad</a>
+                </div>
+            </article>
+
+            <article class="panel-card table-panel recent-activity-panel">
+                <div class="panel-head">
+                    <p class="eyebrow">ACTIVIDAD RECIENTE</p>
+                    <p class="panel-title">Últimas evaluaciones</p>
+                </div>
+                {% if ultimas_consultas and ultimas_consultas|length > 0 %}
+                    <div class="table-wrap recent-table-wrap">
+                        <table class="history-table recent-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Monto (USD)</th>
+                                    <th scope="col">Riesgo</th>
+                                    <th scope="col">Probabilidad</th>
+                                    <th scope="col">Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for consulta in ultimas_consultas[:8] %}
+                                <tr>
+                                    <td data-label="ID">{{ consulta.id }}</td>
+                                    <td data-label="Monto">{{ format_usd(consulta.monto) }}</td>
+                                    <td data-label="Riesgo"><span class="risk-badge {{ consulta.riesgo_badge_class }}">{{ consulta.riesgo_badge_texto }}</span></td>
+                                    <td data-label="Probabilidad">{{ consulta.probabilidad_fraude }}%</td>
+                                    <td data-label="Fecha">{{ consulta.created_at }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="status">No hay actividad reciente para mostrar.</p>
+                {% endif %}
+            </article>
+            {% elif page == 'new_transaction' %}
+            <article class="panel-card">
+                <div class="panel-head"><p class="eyebrow">NUEVA TRANSACCIÓN</p><p class="panel-title">Simulador de Riesgo</p></div>
+                <form action="{{ url_for('predict') }}" method="post" class="form-grid dashboard-form" data-loading-text="Analizando transacción…" data-geolocation-form="true">
+                    <p class="status">Modelo de evaluación fijo: {{ fixed_model_label }}</p>
+                    {% if geo_error %}
+                        <p class="status error-status">{{ geo_error }}</p>
+                    {% endif %}
+                    <label for="simulation_count">Cantidad de transacciones simuladas</label>
+                    <input id="simulation_count" type="number" name="simulation_count" min="1" max="200" step="1" value="1" placeholder="Ej: 10">
+                    <button type="button" class="secondary-button tx-simulate-button" data-simulate-transaction>Generar transacción simulada</button>
+                    <div class="tx-simulate-output" data-simulate-output hidden aria-live="polite"></div>
+                    <section class="tx-simulate-stats" data-simulate-stats aria-live="polite">
+                        <div class="tx-simulate-stat-card">
+                            <span>Simuladas</span>
+                            <strong data-sim-count-total>0</strong>
+                        </div>
+                        <div class="tx-simulate-stat-card tx-simulate-stat-fraud">
+                            <span>Fraudes detectados</span>
+                            <strong data-sim-count-fraud>0</strong>
+                        </div>
+                        <div class="tx-simulate-stat-card">
+                            <span>Tasa de fraude</span>
+                            <strong data-sim-count-rate>0%</strong>
+                        </div>
+                    </section>
+                    <button type="button" class="secondary-button tx-geo-button" data-detect-location>Usar mi ubicación actual</button>
+                    <label for="geo_location_display">Ubicación detectada</label>
+                    <input id="geo_location_display" type="text" placeholder="Aún sin detectar" readonly>
+                    <input type="hidden" name="geo_location_label" id="geo_location_label">
+                    <input type="hidden" name="geo_latitude" id="geo_latitude">
+                    <input type="hidden" name="geo_longitude" id="geo_longitude">
+                    <input type="hidden" name="real_transaction_hour" id="real_transaction_hour">
+                    <p class="subtitle tx-geo-status" id="geo_status_message">Debes detectar tu ubicación actual para enviar la transacción con localización real.</p>
+
+                    <p class="status">Campos exactos del modelo entrenado (19 variables)</p>
+                    <label for="model_monto_usd">Monto_USD</label>
+                    <input id="model_monto_usd" type="number" step="any" name="model_monto_usd" placeholder="Ej: 1250.50" required>
+
+                    <label for="model_genero">Genero</label>
+                    <select id="model_genero" name="model_genero" required>
+                        <option value="" disabled selected>Selecciona género</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Femenino">Femenino</option>
+                    </select>
+
+                    <label for="model_edad">Edad</label>
+                    <input id="model_edad" type="number" name="model_edad" min="18" max="100" step="1" placeholder="Ej: 35" required>
+
+                    <label for="model_ciudad">Ciudad</label>
+                    <input id="model_ciudad" type="text" name="model_ciudad" placeholder="Ej: Bangalore" required>
+
+                    <label for="model_tipo_cuenta">Tipo_Cuenta</label>
+                    <select id="model_tipo_cuenta" name="model_tipo_cuenta" required>
+                        <option value="" disabled selected>Selecciona tipo de cuenta</option>
+                        <option value="Ahorros">Ahorros</option>
+                        <option value="Corriente">Corriente</option>
+                        <option value="Empresarial">Empresarial</option>
+                    </select>
+
+                    <label for="model_tipo_transaccion">Tipo_Transaccion</label>
+                    <select id="model_tipo_transaccion" name="model_tipo_transaccion" required>
+                        <option value="" disabled selected>Selecciona tipo de transacción</option>
+                        <option value="Débito">Débito</option>
+                        <option value="Crédito">Crédito</option>
+                        <option value="Transferencia">Transferencia</option>
+                        <option value="Pago de Factura">Pago de Factura</option>
+                        <option value="Retiro">Retiro</option>
+                    </select>
+
+                    <label for="model_categoria_comercio">Categoria_Comercio</label>
+                    <select id="model_categoria_comercio" name="model_categoria_comercio" required>
+                        <option value="" disabled selected>Selecciona categoría</option>
+                        <option value="Supermercado">Supermercado</option>
+                        <option value="Restaurante">Restaurante</option>
+                        <option value="Salud">Salud</option>
+                        <option value="Electrónica">Electrónica</option>
+                        <option value="Entretenimiento">Entretenimiento</option>
+                        <option value="Ropa">Ropa</option>
+                    </select>
+
+                    <label for="model_balance_cuenta_usd">Balance_Cuenta_USD</label>
+                    <input id="model_balance_cuenta_usd" type="number" step="any" name="model_balance_cuenta_usd" placeholder="Ej: 3200.00" required>
+
+                    <label for="model_dispositivo_transaccion">Dispositivo_Transaccion</label>
+                    <input id="model_dispositivo_transaccion" type="text" name="model_dispositivo_transaccion" placeholder="Ej: POS-Terminal-12" required>
+
+                    <label for="model_tipo_dispositivo">Tipo_Dispositivo</label>
+                    <select id="model_tipo_dispositivo" name="model_tipo_dispositivo" required>
+                        <option value="" disabled selected>Selecciona tipo de dispositivo</option>
+                        <option value="Computador">Computador</option>
+                        <option value="Móvil">Móvil</option>
+                        <option value="Cajero Automático">Cajero Automático</option>
+                        <option value="Punto de Venta">Punto de Venta</option>
+                    </select>
+
+                    <label for="model_porcentaje_gasto">Porcentaje_Gasto</label>
+                    <input id="model_porcentaje_gasto" type="number" step="any" name="model_porcentaje_gasto" placeholder="Ej: 28.5" required>
+
+                    <label for="model_transaccion_grande">Transaccion_Grande</label>
+                    <select id="model_transaccion_grande" name="model_transaccion_grande" required>
+                        <option value="" disabled selected>Selecciona valor</option>
+                        <option value="0">0 (No)</option>
+                        <option value="1">1 (Sí)</option>
+                    </select>
+
+                    <label for="model_saldo_restante">Saldo_Restante</label>
+                    <input id="model_saldo_restante" type="number" step="any" name="model_saldo_restante" placeholder="Ej: 1950.25" required>
+
+                    <label for="model_compra_riesgosa">Compra_Riesgosa</label>
+                    <select id="model_compra_riesgosa" name="model_compra_riesgosa" required>
+                        <option value="" disabled selected>Selecciona valor</option>
+                        <option value="0">0 (No)</option>
+                        <option value="1">1 (Sí)</option>
+                    </select>
+
+                    <label for="model_riesgo_edad_monto">Riesgo_Edad_Monto</label>
+                    <input id="model_riesgo_edad_monto" type="number" step="any" name="model_riesgo_edad_monto" placeholder="Ej: 4.75" required>
+
+                    <label for="model_dia_semana">Dia_Semana</label>
+                    <select id="model_dia_semana" name="model_dia_semana" required>
+                        <option value="" disabled selected>Selecciona día</option>
+                        <option value="1">1 (Lunes)</option>
+                        <option value="2">2 (Martes)</option>
+                        <option value="3">3 (Miércoles)</option>
+                        <option value="4">4 (Jueves)</option>
+                        <option value="5">5 (Viernes)</option>
+                        <option value="6">6 (Sábado)</option>
+                        <option value="7">7 (Domingo)</option>
+                    </select>
+
+                    <label for="model_mes">Mes</label>
+                    <select id="model_mes" name="model_mes" required>
+                        <option value="" disabled selected>Selecciona mes</option>
+                        <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                        <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                        <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                    </select>
+
+                    <label for="model_hora">Hora (0-23)</label>
+                    <input id="model_hora" type="number" name="model_hora" min="0" max="23" step="1" placeholder="Ej: 14" required>
+
+                    <label for="model_transaccion_nocturna">Transaccion_Nocturna</label>
+                    <select id="model_transaccion_nocturna" name="model_transaccion_nocturna" required>
+                        <option value="" disabled selected>Selecciona valor</option>
+                        <option value="0">0 (No)</option>
+                        <option value="1">1 (Sí)</option>
+                    </select>
+                    <div class="form-buttons-row">
+                        <button type="submit">Analizar Riesgo</button>
+                        <button type="reset" class="secondary-button">Limpiar campos</button>
+                    </div>
+                </form>
+            </article>
+            {% elif page == 'model_metrics' %}
+            <article class="panel-card model-metrics-panel">
+                <div class="panel-head"><p class="eyebrow">VALIDACIÓN CIENTÍFICA</p><p class="panel-title">Dashboard de Métricas del Modelo</p></div>
+                {% if current_user.role == 'administrador' %}<p class="subtitle">Vista global de métricas para todos los usuarios del sistema.</p>{% endif %}
+                {% if model_selection_locked %}
+                    <p class="status">Modelo listo para evaluación.</p>
+                {% else %}
+                    <form method="get" action="{{ url_for('model_metrics_page') }}" class="model-select-form">
+                        <label for="model">Selección de modelo</label>
+                        <select id="model" name="model" onchange="this.form.submit()">
+                            {% for key, label in model_choices.items() %}
+                                <option value="{{ key }}" {% if key == selected_model %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                {% endif %}
+                <form method="get" action="{{ url_for('model_metrics_page') }}" class="metrics-refresh-form">
+                    <input type="hidden" name="recalcular" value="1">
+                    <button type="submit" class="secondary-button model-metrics-refresh-btn">Recalcular métricas desde dataset montado</button>
+                </form>
+                {% if metrics_notice %}
+                    <p class="status">{{ metrics_notice }}</p>
+                {% endif %}
+                <div class="model-metrics-grid">
+                    <div class="metric-card"><p class="kpi-label">Accuracy</p><p class="metric-value">{{ model_metrics.accuracy }}%</p></div>
+                    <div class="metric-card"><p class="kpi-label">Precision</p><p class="metric-value">{{ model_metrics.precision }}%</p></div>
+                    <div class="metric-card"><p class="kpi-label">Recall</p><p class="metric-value">{{ model_metrics.recall }}%</p></div>
+                    <div class="metric-card"><p class="kpi-label">F1-score</p><p class="metric-value">{{ model_metrics.f1_score }}%</p></div>
+                    <div class="metric-card"><p class="kpi-label">AUC-ROC</p><p class="metric-value">{{ model_metrics.auc_roc }}</p></div>
+                </div>
+                <div class="confusion-wrap">
+                    <p class="kpi-label">Matriz de confusión</p>
+                    <div class="confusion-grid">
+                        <div class="cm-cell cm-head">Real \ Predicho</div><div class="cm-cell cm-head">No Fraude</div><div class="cm-cell cm-head">Fraude</div>
+                        <div class="cm-cell cm-head">No Fraude</div><div class="cm-cell cm-tn">TN<br><strong>{{ confusion_matrix.tn }}</strong></div><div class="cm-cell cm-fp">FP<br><strong>{{ confusion_matrix.fp }}</strong></div>
+                        <div class="cm-cell cm-head">Fraude</div><div class="cm-cell cm-fn">FN<br><strong>{{ confusion_matrix.fn }}</strong></div><div class="cm-cell cm-tp">TP<br><strong>{{ confusion_matrix.tp }}</strong></div>
+                    </div>
+                </div>
+                <article class="roc-card">
+                    <p class="kpi-label">Curva ROC</p>
+                    <svg viewBox="0 0 320 220" class="roc-svg" role="img" aria-label="Curva ROC del modelo seleccionado">
+                        <line x1="30" y1="190" x2="290" y2="190" class="roc-axis"></line>
+                        <line x1="30" y1="190" x2="30" y2="20" class="roc-axis"></line>
+                        <line x1="30" y1="190" x2="290" y2="20" class="roc-base"></line>
+                        <polyline class="roc-line" points="{% for p in roc_curve %}{{ 30 + (p.fpr * 260) }},{{ 190 - (p.tpr * 170) }} {% endfor %}"></polyline>
+                    </svg>
+                </article>
+            </article>
+            {% elif page == 'explainability' %}
+            <article class="panel-card risk-hero {{ riesgo_destacado.class }}">
+                <div class="panel-head"><p class="eyebrow">RESULTADO DESTACADO</p><p class="panel-title">Nivel de riesgo principal</p></div>
+                <p class="risk-hero-title">{{ riesgo_destacado.texto }}</p>
+                <p class="risk-hero-prob">{{ riesgo_destacado.probabilidad }}% de probabilidad de fraude</p>
+                <p class="risk-hero-traffic">
+                    {% if 'alto' in riesgo_destacado.texto|lower %}
+                        <span class="risk-traffic risk-traffic-alto">🔴 Alto</span>
+                    {% elif 'medio' in riesgo_destacado.texto|lower %}
+                        <span class="risk-traffic risk-traffic-medio">🟡 Medio</span>
+                    {% else %}
+                        <span class="risk-traffic risk-traffic-bajo">🟢 Bajo</span>
+                    {% endif %}
+                </p>
+                <div class="risk-meter-wrap compact">
+                    <p class="risk-meter-label">Riesgo: {{ riesgo_destacado.probabilidad }}%</p>
+                    {% if 'alto' in riesgo_destacado.texto|lower %}
+                        <progress class="risk-meter risk-fill-alto" max="100" value="{{ riesgo_destacado.probabilidad }}"></progress>
+                    {% elif 'medio' in riesgo_destacado.texto|lower %}
+                        <progress class="risk-meter risk-fill-medio" max="100" value="{{ riesgo_destacado.probabilidad }}"></progress>
+                    {% else %}
+                        <progress class="risk-meter risk-fill-bajo" max="100" value="{{ riesgo_destacado.probabilidad }}"></progress>
+                    {% endif %}
+                </div>
+                <p class="risk-hero-rec">Recomendación: {{ riesgo_destacado.recomendacion }}</p>
+            </article>
+            <article class="panel-card">
+                <div class="panel-head"><p class="eyebrow">EXPLICABILIDAD</p><p class="panel-title">Factores clave de la decisión</p></div>
+                <div class="shap-summary-box"><p class="kpi-label">Explicabilidad (SHAP)</p><p class="shap-summary">{{ shap_summary }}</p></div>
+                <div class="explain-grid">
+                    {% for factor in explainability_factors %}
+                    <div class="explain-row"><p>{{ factor.label }}</p><progress class="explain-track" max="100" value="{{ factor.impact }}"></progress><strong>{{ factor.impact }}%</strong></div>
+                    {% endfor %}
+                </div>
+
+                <article class="impact-table-card">
+                    <p class="kpi-label">Factores que influyeron en la decisión</p>
+                    <div class="table-wrap impact-table-wrap">
+                        <table class="history-table impact-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Variable</th>
+                                    <th scope="col">Impacto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for factor in explainability_factors %}
+                                <tr>
+                                    <td data-label="Variable">{{ factor.label }}</td>
+                                    <td data-label="Impacto">+{{ factor.impact }}%</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+                {% if ultima_consulta %}
+                <div class="last-result-box">
+                    <p class="kpi-label">Última evaluación analizada</p>
+                    <p class="last-result-title">{{ ultima_consulta.created_at }}</p>
+                    <p class="last-result-sub">{{ ultima_consulta.resultado }}</p>
+                </div>
+                {% endif %}
+            </article>
+            {% elif page == 'history' %}
+            <article class="panel-card table-panel">
+                <div class="panel-head"><p class="eyebrow">TRAZABILIDAD</p><p class="panel-title">Historial de consultas</p></div>
+                <p class="subtitle">{% if current_user.role == 'administrador' %}Vista global del sistema{% else %}Tus consultas registradas{% endif %}</p>
+                <section class="history-kpi-grid">
+                    <article class="history-kpi"><p class="kpi-label">% Fraude</p><p class="history-kpi-value">{{ fraude_pct }}%</p></article>
+                    <article class="history-kpi"><p class="kpi-label">Score Promedio</p><p class="history-kpi-value">{{ score_prom }}</p></article>
+                    <article class="history-kpi"><p class="kpi-label">Modelo Activo</p><p class="history-kpi-value small">{{ active_model_label }}</p></article>
+                </section>
+                <form method="get" action="{{ url_for('history') }}" class="history-filter-form">
+                    <label for="tx_id">Buscar por ID de transacción</label><input id="tx_id" type="text" name="tx_id" value="{{ tx_id }}" placeholder="Ej: 120">
+                    <label for="date_filter">Filtro por fecha</label>
+                    <select id="date_filter" name="date_filter">
+                        <option value="" {% if date_filter == '' %}selected{% endif %}>Todas</option>
+                        <option value="today" {% if date_filter == 'today' %}selected{% endif %}>Hoy</option>
+                        <option value="7days" {% if date_filter == '7days' %}selected{% endif %}>Últimos 7 días</option>
+                        <option value="month" {% if date_filter == 'month' %}selected{% endif %}>Último mes</option>
+                    </select>
+                    <button type="submit">Aplicar filtros</button>
+                    <a class="back-link" href="{{ url_for('history') }}">Limpiar</a>
+                </form>
+                <div class="history-actions">
+                    <a class="export-btn" href="{{ url_for('export_history_csv', tx_id=tx_id, date_filter=date_filter) }}">⬇ Exportar a CSV</a>
+                    <a class="export-btn" href="{{ url_for('export_history_pdf', tx_id=tx_id, date_filter=date_filter) }}">⬇ Descargar reporte PDF</a>
+                </div>
+                {% if consultas %}
+                    <div class="history-meta"><p class="history-count">{{ consultas|length }} registros</p><p class="history-hint">Desliza horizontalmente para ver todas las columnas.</p></div>
+                    <div class="table-wrap">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Fecha</th><th scope="col">Usuario</th><th scope="col">Monto (USD)</th><th scope="col">Comercio</th><th scope="col">Metodo</th><th scope="col">Ubicacion</th><th scope="col">Frecuencia</th><th scope="col">Hora</th><th scope="col">Score <span class="ui-tooltip" tabindex="0" aria-label="Información sobre score de riesgo">🛈<span class="ui-tooltip-text">El score de riesgo representa la probabilidad estimada por el modelo.</span></span></th><th scope="col">Probabilidad</th><th scope="col">Riesgo</th><th scope="col">Recomendación</th><th scope="col">Resultado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for consulta in consultas %}
+                                <tr>
+                                    <td data-label="Fecha">{{ consulta.created_at }}</td>
+                                    <td data-label="Usuario">{{ consulta.username }}</td>
+                                    <td data-label="Monto">{{ format_usd(consulta.monto) }}</td>
+                                    <td data-label="Comercio">{{ consulta.tipo_comercio }}</td>
+                                    <td data-label="Metodo">{{ consulta.metodo_pago }}</td>
+                                    <td data-label="Ubicacion">{{ consulta.ubicacion }}</td>
+                                    <td data-label="Frecuencia">{{ "%.2f"|format(consulta.frecuencia) }}</td>
+                                    <td data-label="Hora">{{ "%.2f"|format(consulta.hora) }}</td>
+                                    <td data-label="Score">{{ "%.2f"|format(consulta.score) }}</td>
+                                    <td data-label="Probabilidad">{{ consulta.probabilidad_fraude }}%</td>
+                                    <td data-label="Riesgo"><span class="risk-badge {{ consulta.riesgo_badge_class }}">{{ consulta.riesgo_badge_texto }}</span></td>
+                                    <td data-label="Recomendación">{{ consulta.recomendacion }}</td>
+                                    <td data-label="Resultado">{{ consulta.resultado }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <article class="activity-log-card">
+                        <div class="activity-head"><p class="eyebrow">REGISTRO DE ACTIVIDAD</p><p class="panel-title">Trazabilidad operativa</p></div>
+                        <table class="activity-table">
+                            <thead><tr><th scope="col">Hora de análisis</th><th scope="col">Usuario</th><th scope="col">Resultado</th></tr></thead>
+                            <tbody>
+                                {% for item in activity_log %}
+                                <tr><td>{{ item.hora }}</td><td>{{ item.usuario }}</td><td>{{ item.resultado }}</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </article>
+                {% else %}
+                    <p class="status">No hay consultas registradas todavía.</p>
+                {% endif %}
+            </article>
+            {% elif page == 'profile' %}
+            <section class="profile-layout profile-layout-main">
+                <article class="panel-card profile-main-card">
+                    <div class="panel-head">
+                        <p class="eyebrow">PERFIL OPERATIVO</p>
+                        <p class="panel-title">Estructura integral del usuario</p>
+                    </div>
+                    <section class="profile-sections-map" aria-label="Secciones del perfil">
+                        <span>Información personal</span>
+                        <span>Seguridad de cuenta</span>
+                        <span>Actividad del usuario</span>
+                        <span>Configuración</span>
+                        <span>Preferencias de alerta</span>
+                    </section>
+                    <section class="profile-identity-hero">
+                        <div class="profile-avatar-wrap">
+                            {% if profile.profile_photo_url %}
+                                <img class="profile-avatar" src="{{ profile.profile_photo_url }}" alt="Foto de perfil de {{ profile.username }}">
+                            {% else %}
+                                <div class="profile-avatar profile-avatar-placeholder" aria-hidden="true"><i class="bi bi-person"></i></div>
+                            {% endif %}
+                        </div>
+                        <div class="profile-identity-meta">
+                            <p class="profile-name">{{ profile.full_name or profile.username }}</p>
+                            <p class="profile-role-chip">{{ 'Administrador' if profile.role == 'administrador' else 'Analista' }}</p>
+                            <p class="profile-created">Cuenta creada: {{ profile.created_at_fmt or 'Sin fecha registrada' }}</p>
+                        </div>
+                    </section>
+                    {% if status_message %}<p class="status">{{ status_message }}</p>{% endif %}
+                    <form method="post" enctype="multipart/form-data" class="form-grid dashboard-form profile-form-grid">
+                        <input type="hidden" name="action" value="update_profile">
+                        <input type="hidden" name="current_profile_photo_url" value="{{ profile.profile_photo_url or '' }}">
+                        <div class="profile-form-section">
+                            <p class="profile-section-title">Información personal</p>
+                            <label for="profile_photo_file">Foto de perfil (archivo)</label>
+                            <input id="profile_photo_file" name="profile_photo_file" type="file" accept=".png,.jpg,.jpeg,.webp,.gif,image/*">
+                            <label class="inline-check" for="remove_profile_photo">
+                                <input id="remove_profile_photo" name="remove_profile_photo" type="checkbox" value="1">
+                                Quitar foto actual
+                            </label>
+                            <label for="username">Usuario</label><input id="username" type="text" value="{{ profile.username }}" readonly>
+                            <label for="role">Rol</label><input id="role" type="text" value="{{ profile.role }}" readonly>
+                            <label for="created_at">Fecha de creación</label><input id="created_at" type="text" value="{{ profile.created_at_fmt or 'Sin fecha registrada' }}" readonly>
+                            <label for="full_name">Nombre completo</label><input id="full_name" name="full_name" type="text" value="{{ profile.full_name or '' }}" placeholder="Ej: Camila Pérez">
+                            <label for="employee_code">Código de colaborador</label><input id="employee_code" name="employee_code" type="text" value="{{ profile.employee_code or '' }}" placeholder="Ej: FRA-2041">
+                            <label for="department">Área / Departamento</label><input id="department" name="department" type="text" value="{{ profile.department or '' }}" placeholder="Ej: Riesgo Operativo">
+                            <label for="office_location">Sede / Oficina</label><input id="office_location" name="office_location" type="text" value="{{ profile.office_location or '' }}" placeholder="Ej: Bogotá - Torre Norte">
+                        </div>
+
+                        <div class="profile-form-section">
+                            <p class="profile-section-title">Preferencias de alerta</p>
+                            <label for="email">Correo corporativo</label><input id="email" name="email" type="email" value="{{ profile.email or '' }}" placeholder="correo@empresa.com">
+                            <label for="phone">Teléfono de guardia</label><input id="phone" name="phone" type="text" value="{{ profile.phone or '' }}" placeholder="Ej: +57 300 123 4567">
+                            <label for="alert_channel">Canal preferido de alerta</label>
+                            <select id="alert_channel" name="alert_channel">
+                                <option value="email" {% if profile.alert_channel == 'email' %}selected{% endif %}>Correo</option>
+                                <option value="sms" {% if profile.alert_channel == 'sms' %}selected{% endif %}>SMS</option>
+                                <option value="both" {% if profile.alert_channel == 'both' %}selected{% endif %}>Correo + SMS</option>
+                            </select>
+                            <label for="bio">Contexto y responsabilidades</label>
+                            <textarea id="bio" name="bio" rows="5" placeholder="Describe tus responsabilidades: monitoreo, revisión manual, escalamiento, etc.">{{ profile.bio or '' }}</textarea>
+                        </div>
+
+                        {% if profile.blocked_until_fmt %}
+                            <p class="status error-status">Estado de seguridad: bloqueo hasta {{ profile.blocked_until_fmt }}</p>
+                        {% endif %}
+                        <button type="submit">Guardar perfil operativo</button>
+                    </form>
+                </article>
+
+                <aside class="profile-side-stack">
+                    <article class="panel-card profile-stat-card">
+                        <p class="eyebrow">ACTIVIDAD DEL USUARIO</p>
+                        <p class="panel-title">Indicadores recientes de operación</p>
+                        <div class="profile-stat-grid">
+                            <div><span>Total consultas</span><strong>{{ profile_stats.total_consultas }}</strong></div>
+                            <div><span>Últimos 7 días</span><strong>{{ profile_stats.consultas_7d }}</strong></div>
+                            <div><span>Fraudes altos 24h</span><strong>{{ profile_stats.fraudes_altos_24h }}</strong></div>
+                        </div>
+                    </article>
+
+                    <article class="panel-card profile-config-card">
+                        <p class="eyebrow">CONFIGURACIÓN</p>
+                        <p class="panel-title">Parámetros y accesos del entorno</p>
+                        <div class="profile-config-grid">
+                            <div><span>Tema actual</span><strong>{{ ui_settings.theme|capitalize if ui_settings and ui_settings.theme else 'Light' }}</strong></div>
+                            <div><span>Idioma actual</span><strong>{{ ui_settings.language|upper if ui_settings and ui_settings.language else 'ES' }}</strong></div>
+                            <div><span>Rol de acceso</span><strong>{{ 'Administrador' if profile.role == 'administrador' else 'Analista' }}</strong></div>
+                        </div>
+                        <div class="profile-config-actions">
+                            {% if session.role == 'administrador' %}
+                                <a class="profile-config-link" href="{{ url_for('system_config') }}">Abrir configuración del sistema</a>
+                            {% else %}
+                                <a class="profile-config-link" href="{{ url_for('analyst_config_page') }}">Abrir configuración del analista</a>
+                            {% endif %}
+                        </div>
+                    </article>
+
+                    <article class="panel-card profile-tip-card">
+                        <p class="eyebrow">BUENAS PRÁCTICAS</p>
+                        <p class="panel-title">Checklist de un perfil antifraude</p>
+                        <ul class="about-list">
+                            <li>Mantener correo y teléfono de guardia actualizados.</li>
+                            <li>Definir canal de alertas para respuesta rápida.</li>
+                            <li>Registrar área, sede y contexto operativo para auditoría.</li>
+                            <li>Evitar usar datos personales no corporativos en el perfil.</li>
+                        </ul>
+                    </article>
+
+                    <article class="panel-card profile-security-card">
+                        <p class="eyebrow">SEGURIDAD DE LA CUENTA</p>
+                        <p class="panel-title">Controles de acceso y sesiones</p>
+                        <form method="post" class="form-grid dashboard-form profile-security-form">
+                            <input type="hidden" name="action" value="update_password">
+                            <label for="current_password">Contraseña actual</label>
+                            <input id="current_password" name="current_password" type="password" autocomplete="current-password" required>
+                            <label for="new_password">Nueva contraseña</label>
+                            <input id="new_password" name="new_password" type="password" autocomplete="new-password" minlength="8" required>
+                            <label for="confirm_password">Confirmar nueva contraseña</label>
+                            <input id="confirm_password" name="confirm_password" type="password" autocomplete="new-password" minlength="8" required>
+                            <button type="submit">Cambiar contraseña</button>
+                        </form>
+                        <form method="post" class="profile-close-sessions-form">
+                            <input type="hidden" name="action" value="close_sessions">
+                            <button type="submit" class="secondary-button">Cerrar otras sesiones activas</button>
+                        </form>
+                    </article>
+
+                </aside>
+            </section>
+            <section class="profile-access-bottom">
+                <article class="panel-card profile-access-card">
+                    <p class="eyebrow">ÚLTIMOS ACCESOS</p>
+                    <p class="panel-title">Eventos recientes de autenticación</p>
+                    {% if access_logs %}
+                    <div class="table-wrap profile-access-table-wrap">
+                        <table class="history-table profile-access-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Fecha</th>
+                                    <th scope="col">Nivel</th>
+                                    <th scope="col">Evento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in access_logs %}
+                                <tr>
+                                    <td>{{ item.created_at }}</td>
+                                    <td>{{ item.severity }}</td>
+                                    <td>{{ item.message }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                        <p class="status">Aún no hay eventos de acceso registrados.</p>
+                    {% endif %}
+                </article>
+            </section>
+            {% elif page == 'analyst_config' %}
+            <section class="profile-layout">
+                <article class="panel-card profile-main-card">
+                    <div class="panel-head">
+                        <p class="eyebrow">⚙️ CONFIGURACIÓN DEL ANALISTA</p>
+                        <p class="panel-title">Ajustes personales de tu cuenta</p>
+                    </div>
+                    <section class="profile-sections-map" aria-label="Secciones de configuración del analista">
+                        <span>Perfil</span>
+                        <span>Seguridad</span>
+                        <span>Configuración</span>
+                        <span>Notificaciones</span>
+                        <span>Configuración del sistema</span>
+                    </section>
+                    <section class="config-shortcuts-grid" aria-label="Accesos rápidos de configuración del analista">
+                        <a class="profile-config-link" href="{{ url_for('my_profile') }}">Perfil</a>
+                        <a class="profile-config-link" href="{{ url_for('analyst_security_page') }}">Seguridad</a>
+                        <span class="profile-config-link profile-config-link-active">Configuración</span>
+                        <a class="profile-config-link" href="{{ url_for('analyst_notifications_page') }}">Notificaciones</a>
+                        <span class="profile-config-link profile-config-link-disabled">Configuración del sistema (solo admin)</span>
+                    </section>
+                    {% if status_message %}<p class="status">{{ status_message }}</p>{% endif %}
+                    {% if error %}<p class="status error-status">{{ error }}</p>{% endif %}
+                    <form method="post" enctype="multipart/form-data" class="form-grid dashboard-form profile-form-grid">
+                        <input type="hidden" name="current_profile_photo_url" value="{{ profile.profile_photo_url or '' }}">
+
+                        <div class="profile-form-section">
+                            <p class="profile-section-title">👤 Información personal</p>
+                            <label for="full_name">Nombre</label>
+                            <input id="full_name" name="full_name" type="text" value="{{ profile.full_name or '' }}" placeholder="Ej: Camila Pérez">
+
+                            <label for="email">Correo</label>
+                            <input id="email" name="email" type="email" value="{{ profile.email or '' }}" placeholder="correo@empresa.com">
+
+                            <label for="profile_photo_file">Foto de perfil</label>
+                            <input id="profile_photo_file" name="profile_photo_file" type="file" accept=".png,.jpg,.jpeg,.webp,.gif,image/*">
+                            <label class="inline-check" for="remove_profile_photo">
+                                <input id="remove_profile_photo" name="remove_profile_photo" type="checkbox" value="1">
+                                Quitar foto actual
+                            </label>
+
+                            <label for="phone">Teléfono (opcional)</label>
+                            <input id="phone" name="phone" type="text" value="{{ profile.phone or '' }}" placeholder="Ej: +57 300 123 4567">
+                        </div>
+
+                        <div class="profile-form-section">
+                            <p class="profile-section-title">Apariencia de interfaz</p>
+                            <label for="theme_preference">Tema claro / oscuro</label>
+                            <select id="theme_preference" name="theme_preference" required>
+                                {% for key, label in theme_choices.items() %}
+                                    <option value="{{ key }}" {% if profile.theme_preference == key %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <label for="interface_size">Tamaño de interfaz</label>
+                            <select id="interface_size" name="interface_size" required>
+                                {% for key, label in interface_size_choices.items() %}
+                                    <option value="{{ key }}" {% if profile.interface_size == key %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <label for="username">Usuario</label>
+                            <input id="username" type="text" value="{{ profile.username }}" readonly>
+                        </div>
+
+                        <button type="submit">Guardar configuración del analista</button>
+                    </form>
+                </article>
+            </section>
+            {% elif page == 'analyst_notifications' %}
+            <section class="profile-layout">
+                <article class="panel-card profile-main-card">
+                    <div class="panel-head">
+                        <p class="eyebrow">🔔 CONFIGURACIÓN DE NOTIFICACIONES</p>
+                        <p class="panel-title">Preferencias de alertas del analista</p>
+                    </div>
+                    <section class="profile-sections-map" aria-label="Secciones de configuración del analista">
+                        <span>Perfil</span>
+                        <span>Seguridad</span>
+                        <span>Configuración</span>
+                        <span>Notificaciones</span>
+                        <span>Configuración del sistema</span>
+                    </section>
+                    <section class="config-shortcuts-grid" aria-label="Accesos rápidos de configuración del analista">
+                        <a class="profile-config-link" href="{{ url_for('my_profile') }}">Perfil</a>
+                        <a class="profile-config-link" href="{{ url_for('analyst_security_page') }}">Seguridad</a>
+                        <a class="profile-config-link" href="{{ url_for('analyst_config_page') }}">Configuración</a>
+                        <span class="profile-config-link profile-config-link-active">Notificaciones</span>
+                        <span class="profile-config-link profile-config-link-disabled">Configuración del sistema (solo admin)</span>
+                    </section>
+
+                    {% if status_message %}<p class="status">{{ status_message }}</p>{% endif %}
+
+                    <form method="post" class="form-grid dashboard-form profile-form-grid">
+                        <div class="profile-form-section">
+                            <p class="profile-section-title">🔔 Configuración de Notificaciones</p>
+
+                            <label class="inline-check" for="notif_high_risk">
+                                <input id="notif_high_risk" name="notif_high_risk" type="checkbox" value="1" {% if profile.notif_high_risk == 1 %}checked{% endif %}>
+                                Notificar cuando se detecte riesgo alto
+                            </label>
+
+                            <label class="inline-check" for="notif_critical_alerts">
+                                <input id="notif_critical_alerts" name="notif_critical_alerts" type="checkbox" value="1" {% if profile.notif_critical_alerts == 1 %}checked{% endif %}>
+                                Notificar alertas críticas del sistema
+                            </label>
+
+                            <label class="inline-check" for="notif_analysis_complete">
+                                <input id="notif_analysis_complete" name="notif_analysis_complete" type="checkbox" value="1" {% if profile.notif_analysis_complete == 1 %}checked{% endif %}>
+                                Notificar cuando se complete un análisis
+                            </label>
+
+                            <label class="inline-check" for="notif_new_transactions">
+                                <input id="notif_new_transactions" name="notif_new_transactions" type="checkbox" value="1" {% if profile.notif_new_transactions == 1 %}checked{% endif %}>
+                                Notificar nuevas transacciones registradas
+                            </label>
+
+                            <label class="inline-check" for="notif_user_activity">
+                                <input id="notif_user_activity" name="notif_user_activity" type="checkbox" value="1" {% if profile.notif_user_activity == 1 %}checked{% endif %}>
+                                Notificar cambios realizados por otros usuarios
+                            </label>
+
+                            <div class="notification-block">
+                                <p class="kpi-label">Tipo de notificación</p>
+                                <label class="inline-check" for="notif_in_app">
+                                    <input id="notif_in_app" name="notif_in_app" type="checkbox" value="1" checked disabled>
+                                    Dentro del sistema
+                                </label>
+                                <p class="subtitle">En esta versión se usa notificación dentro del sistema.</p>
+                            </div>
+
+                            <div class="notification-block">
+                                <p class="kpi-label">Frecuencia de notificaciones</p>
+                                <div class="radio-list">
+                                    {% for key, label in notification_frequency_choices.items() %}
+                                    <label class="inline-check" for="notif_frequency_{{ key }}">
+                                        <input id="notif_frequency_{{ key }}" name="notif_frequency" type="radio" value="{{ key }}" {% if profile.notif_frequency == key %}checked{% endif %}>
+                                        {{ label }}
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit">Guardar notificaciones</button>
+                    </form>
+                </article>
+            </section>
+            {% elif page == 'analyst_security' %}
+            <section class="profile-layout">
+                <article class="panel-card profile-main-card">
+                    <div class="panel-head">
+                        <p class="eyebrow">🔐 SEGURIDAD (PARA EL ANALISTA)</p>
+                        <p class="panel-title">Controles de acceso y protección de la cuenta</p>
+                    </div>
+                    <section class="profile-sections-map" aria-label="Secciones de configuración del analista">
+                        <span>Perfil</span>
+                        <span>Seguridad</span>
+                        <span>Configuración</span>
+                        <span>Notificaciones</span>
+                        <span>Configuración del sistema</span>
+                    </section>
+                    <section class="config-shortcuts-grid" aria-label="Accesos rápidos de configuración del analista">
+                        <a class="profile-config-link" href="{{ url_for('my_profile') }}">Perfil</a>
+                        <span class="profile-config-link profile-config-link-active">Seguridad</span>
+                        <a class="profile-config-link" href="{{ url_for('analyst_config_page') }}">Configuración</a>
+                        <a class="profile-config-link" href="{{ url_for('analyst_notifications_page') }}">Notificaciones</a>
+                        <span class="profile-config-link profile-config-link-disabled">Configuración del sistema (solo admin)</span>
+                    </section>
+
+                    {% if status_message %}<p class="status">{{ status_message }}</p>{% endif %}
+                    {% if notice %}<p class="status">{{ notice }}</p>{% endif %}
+                    {% if error %}<p class="status error-status">{{ error }}</p>{% endif %}
+
+                    <div class="profile-form-section">
+                        <p class="profile-section-title">1️⃣ Cambiar contraseña</p>
+                        <form method="post" class="form-grid dashboard-form profile-security-form">
+                            <input type="hidden" name="action" value="update_password">
+                            <label for="current_password">Contraseña actual</label>
+                            <input id="current_password" name="current_password" type="password" autocomplete="current-password" required>
+                            <label for="new_password">Nueva contraseña</label>
+                            <input id="new_password" name="new_password" type="password" autocomplete="new-password" minlength="8" required>
+                            <label for="confirm_password">Confirmar nueva contraseña</label>
+                            <input id="confirm_password" name="confirm_password" type="password" autocomplete="new-password" minlength="8" required>
+                            <button type="submit">Actualizar contraseña</button>
+                        </form>
+                    </div>
+
+                    <div class="profile-form-section">
+                        <p class="profile-section-title">🕵️ Actividad reciente de la cuenta</p>
+                        {% if security_activity %}
+                        <div class="table-wrap profile-access-table-wrap">
+                            <table class="history-table profile-access-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Fecha</th>
+                                        <th scope="col">Dispositivo</th>
+                                        <th scope="col">IP</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in security_activity %}
+                                    <tr>
+                                        <td>{{ item.created_at }}</td>
+                                        <td>{{ item.device }}</td>
+                                        <td>{{ item.ip_address }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                            <p class="status">Aún no hay actividad registrada.</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="profile-form-section">
+                        <p class="profile-section-title">📱 Sesiones activas</p>
+                        <div class="security-session-list">
+                            {% for s in active_sessions %}
+                            <article class="security-session-item">
+                                <p class="kpi-label">{{ s.label }}</p>
+                                <p class="subtitle">{{ s.detail }}</p>
+                                {% if not s.is_current %}
+                                <form method="post" class="profile-close-sessions-form">
+                                    <input type="hidden" name="action" value="close_other_session">
+                                    <button type="submit" class="secondary-button">Cerrar sesión</button>
+                                </form>
+                                {% endif %}
+                            </article>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="profile-form-section">
+                        <p class="profile-section-title">🔑 Autenticación en dos pasos (opcional)</p>
+                        <form method="post" class="form-grid dashboard-form">
+                            <input type="hidden" name="action" value="update_security_preferences">
+
+                            <label class="inline-check" for="security_two_factor">
+                                <input id="security_two_factor" name="security_two_factor" type="checkbox" value="1" {% if profile.security_two_factor == 1 %}checked{% endif %}>
+                                Activar verificación por código
+                            </label>
+
+                            <p class="profile-section-title">🚨 Alertas de seguridad</p>
+                            <label class="inline-check" for="security_notify_login">
+                                <input id="security_notify_login" name="security_notify_login" type="checkbox" value="1" {% if profile.security_notify_login == 1 %}checked{% endif %}>
+                                Notificar inicio de sesión
+                            </label>
+                            <label class="inline-check" for="security_notify_failed">
+                                <input id="security_notify_failed" name="security_notify_failed" type="checkbox" value="1" {% if profile.security_notify_failed == 1 %}checked{% endif %}>
+                                Notificar intentos fallidos
+                            </label>
+
+                            <button type="submit">Guardar ajustes de seguridad</button>
+                        </form>
+                    </div>
+
+                    <div class="profile-form-section">
+                        <p class="profile-section-title">🔒 Cerrar todas las sesiones</p>
+                        <form method="post" class="profile-close-sessions-form">
+                            <input type="hidden" name="action" value="close_sessions">
+                            <button type="submit" class="secondary-button">Cerrar todas las sesiones</button>
+                        </form>
+                    </div>
+                </article>
+            </section>
+            {% elif page == 'system_config' %}
+            <section class="profile-sections-map" aria-label="Secciones de configuración del sistema">
+                <span>Sistema</span>
+                <span>Modelo</span>
+                <span>Datos</span>
+                <span>Seguridad</span>
+            </section>
+            <section class="config-shortcuts-grid" aria-label="Accesos rápidos de configuración del sistema">
+                <span class="profile-config-link profile-config-link-active">Sistema</span>
+                <a class="profile-config-link" href="{{ url_for('model_management') }}">Modelo</a>
+                <a class="profile-config-link" href="{{ url_for('data_management') }}">Datos</a>
+                <a class="profile-config-link" href="{{ url_for('system_security_page') }}">Seguridad</a>
+            </section>
+            <section class="admin-kpi-grid admin-kpi-grid-3">
+                <article class="admin-kpi-card admin-kpi-card-gear">
+                    <p class="kpi-label">Centro de control</p>
+                    <p class="admin-kpi-title"><span class="gear-glyph" aria-hidden="true">⚙</span> Configuración inteligente</p>
+                    <p class="admin-kpi-sub">Ajusta umbrales, alertas y motor de scoring en una sola vista.</p>
+                </article>
+                <article class="admin-kpi-card">
+                    <p class="kpi-label">Modelo activo</p>
+                    <p class="admin-kpi-title">LightGBM</p>
+                </article>
+                <article class="admin-kpi-card">
+                    <p class="kpi-label">Política de bloqueo</p>
+                    <p class="admin-kpi-title">{{ settings.fraud_block_threshold }} alertas / {{ settings.block_minutes }} min</p>
+                </article>
+            </section>
+            <article class="panel-card config-panel">
+                <div class="panel-head"><p class="eyebrow">SISTEMA</p><p class="panel-title">Parámetros operativos</p></div>
+                {% if status_message %}<p class="status">{{ status_message }}</p>{% endif %}
+                <form method="post" class="form-grid dashboard-form">
+                    <p class="status">Motor de evaluación fijo en LightGBM.</p>
+
+                    <label for="language">Idioma</label>
+                    <select id="language" name="language" required>
+                        {% for key, label in language_choices.items() %}
+                            <option value="{{ key }}" {% if settings.language == key %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="theme">Tema de la interfaz</label>
+                    <select id="theme" name="theme" required>
+                        {% for key, label in theme_choices.items() %}
+                            <option value="{{ key }}" {% if settings.theme == key %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="fraud_block_threshold">Bloqueo por fraudes altos (24h)</label><input id="fraud_block_threshold" name="fraud_block_threshold" type="number" min="2" max="20" value="{{ settings.fraud_block_threshold }}" required>
+                    <label for="block_minutes">Minutos de bloqueo</label><input id="block_minutes" name="block_minutes" type="number" min="5" max="240" value="{{ settings.block_minutes }}" required>
+                    <label for="alert_recipient">Correo de alertas (simulado)</label><input id="alert_recipient" name="alert_recipient" type="email" value="{{ settings.alert_recipient }}" required>
+                    <label class="checkbox-row" for="alert_email_enabled"><input id="alert_email_enabled" name="alert_email_enabled" type="checkbox" {% if settings.alert_email_enabled == '1' %}checked{% endif %}>Simular envío de alerta por correo</label>
+                    <button type="submit">Guardar configuración</button>
+                </form>
+            </article>
+            {% elif page == 'system_logs' %}
+            {% set log_ns = namespace(total=0, warn=0, info=0) %}
+            {% for item in logs %}
+                {% set log_ns.total = log_ns.total + 1 %}
+                {% if item.severity == 'WARN' %}
+                    {% set log_ns.warn = log_ns.warn + 1 %}
+                {% endif %}
+                {% if item.severity == 'INFO' %}
+                    {% set log_ns.info = log_ns.info + 1 %}
+                {% endif %}
+            {% endfor %}
+            <section class="admin-kpi-grid">
+                <article class="admin-kpi-card"><p class="kpi-label">Eventos visibles</p><p class="admin-kpi-title">{{ log_ns.total }}</p></article>
+                <article class="admin-kpi-card"><p class="kpi-label">Alertas WARN</p><p class="admin-kpi-title">{{ log_ns.warn }}</p></article>
+                <article class="admin-kpi-card"><p class="kpi-label">Eventos INFO</p><p class="admin-kpi-title">{{ log_ns.info }}</p></article>
+                <article class="admin-kpi-card"><p class="kpi-label">Estado</p><p class="admin-kpi-title">Monitoreo activo</p></article>
+            </section>
+            <article class="panel-card table-panel">
+                <div class="panel-head"><p class="eyebrow">TRAZABILIDAD TÉCNICA</p><p class="panel-title">Eventos operativos recientes</p></div>
+                <div class="table-wrap">
+                    <table class="history-table logs-table">
+                        <thead><tr><th scope="col">Fecha</th><th scope="col">Tipo</th><th scope="col">Nivel</th><th scope="col">Actor</th><th scope="col">Mensaje</th></tr></thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr><td data-label="Fecha">{{ log.created_at }}</td><td data-label="Tipo">{{ log.event_type }}</td><td data-label="Nivel">{{ log.severity }}</td><td data-label="Actor">{{ log.actor_username }}</td><td data-label="Mensaje">{{ log.message }}</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+            {% elif page == 'system_security' %}
+            <section class="admin-kpi-grid">
+                <article class="admin-kpi-card"><p class="kpi-label">Intentos login 24h</p><p class="admin-kpi-title">{{ security_stats.total_attempts_24h }}</p></article>
+                <article class="admin-kpi-card"><p class="kpi-label">Fallidos 24h</p><p class="admin-kpi-title">{{ security_stats.failed_attempts_24h }}</p></article>
+                <article class="admin-kpi-card"><p class="kpi-label">IPs bloqueadas activas</p><p class="admin-kpi-title">{{ security_stats.active_blocked_ips }}</p></article>
+                <article class="admin-kpi-card"><p class="kpi-label">IPs únicas 24h</p><p class="admin-kpi-title">{{ security_stats.unique_ips_24h }}</p></article>
+            </section>
+
+            {% if notice %}<p class="status">{{ notice }}</p>{% endif %}
+            {% if error %}<p class="status error-status">{{ error }}</p>{% endif %}
+
+            <section class="panel-grid system-security-grid">
+                <article class="panel-card config-panel">
+                    <div class="panel-head"><p class="eyebrow">BLOQUEAR IP SOSPECHOSA</p><p class="panel-title">Contención manual de acceso</p></div>
+                    <form method="post" class="form-grid dashboard-form">
+                        <input type="hidden" name="action" value="block_ip">
+                        <label for="ip_address_block">Dirección IP</label>
+                        <input id="ip_address_block" name="ip_address" type="text" placeholder="Ej: 192.168.1.10" required>
+                        <label for="duration_minutes">Duración del bloqueo (minutos)</label>
+                        <input id="duration_minutes" name="duration_minutes" type="number" min="5" max="1440" value="60" required>
+                        <label for="reason">Motivo</label>
+                        <input id="reason" name="reason" type="text" value="Bloqueo manual por actividad sospechosa" required>
+                        <button type="submit" class="btn-admin-warn">Bloquear IP</button>
+                    </form>
+                </article>
+
+                <article class="panel-card table-panel">
+                    <div class="panel-head"><p class="eyebrow">IPS BLOQUEADAS</p><p class="panel-title">Control de bloqueo y desbloqueo</p></div>
+                    <div class="table-wrap">
+                        <table class="history-table logs-table">
+                            <thead><tr><th scope="col">IP</th><th scope="col">Estado</th><th scope="col">Hasta</th><th scope="col">Motivo</th><th scope="col">Por</th><th scope="col">Acción</th></tr></thead>
+                            <tbody>
+                                {% for item in blocked_ips %}
+                                <tr>
+                                    <td data-label="IP">{{ item.ip_address }}</td>
+                                    <td data-label="Estado">{{ 'Activa' if item.active else 'Expirada' }}</td>
+                                    <td data-label="Hasta">{{ item.blocked_until }}</td>
+                                    <td data-label="Motivo">{{ item.reason }}</td>
+                                    <td data-label="Por">{{ item.created_by }}</td>
+                                    <td data-label="Acción">
+                                        <form method="post" class="inline-admin-form">
+                                            <input type="hidden" name="action" value="unblock_ip"><input type="hidden" name="ip_address" value="{{ item.ip_address }}">
+                                            <button type="submit" class="btn-admin-ok">Desbloquear</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+            </section>
+
+            <article class="panel-card table-panel">
+                <div class="panel-head"><p class="eyebrow">VER INTENTOS DE LOGIN</p><p class="panel-title">Registro de autenticaciones</p></div>
+                <div class="table-wrap">
+                    <table class="history-table logs-table">
+                        <thead><tr><th scope="col">Fecha</th><th scope="col">Usuario</th><th scope="col">IP</th><th scope="col">Resultado</th><th scope="col">Detalle</th></tr></thead>
+                        <tbody>
+                            {% for item in attempts %}
+                            <tr>
+                                <td data-label="Fecha">{{ item.created_at }}</td>
+                                <td data-label="Usuario">{{ item.username }}</td>
+                                <td data-label="IP">{{ item.ip_address }}</td>
+                                <td data-label="Resultado">{{ 'Exitoso' if item.success else 'Fallido' }}</td>
+                                <td data-label="Detalle">{{ item.failure_reason if item.failure_reason else '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article class="panel-card table-panel">
+                <div class="panel-head"><p class="eyebrow">MONITOREAR ACCESOS</p><p class="panel-title">Eventos de seguridad y autenticación</p></div>
+                <div class="table-wrap">
+                    <table class="history-table logs-table">
+                        <thead><tr><th scope="col">Fecha</th><th scope="col">Tipo</th><th scope="col">Nivel</th><th scope="col">Actor</th><th scope="col">Mensaje</th></tr></thead>
+                        <tbody>
+                            {% for item in access_monitor %}
+                            <tr>
+                                <td data-label="Fecha">{{ item.created_at }}</td>
+                                <td data-label="Tipo">{{ item.event_type }}</td>
+                                <td data-label="Nivel">{{ item.severity }}</td>
+                                <td data-label="Actor">{{ item.actor_username }}</td>
+                                <td data-label="Mensaje">{{ item.message }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+            {% elif page == 'user_management' %}
+            {% set user_ns = namespace(total=0, admins=0, blocked=0, fraudes=0) %}
+            {% for item in users %}
+                {% set user_ns.total = user_ns.total + 1 %}
+                {% if item.role == 'administrador' %}
+                    {% set user_ns.admins = user_ns.admins + 1 %}
+                {% endif %}
+                {% if item.blocked_until_fmt %}
+                    {% set user_ns.blocked = user_ns.blocked + 1 %}
+                {% endif %}
+                {% set user_ns.fraudes = user_ns.fraudes + item.fraudes_altos %}
+            {% endfor %}
+            <section class="admin-kpi-grid">
+                <article class="admin-kpi-card"><p class="kpi-label">Usuarios totales</p><p class="admin-kpi-title">{{ user_ns.total }}</p></article>
+                <article class="admin-kpi-card"><p class="kpi-label">Administradores</p><p class="admin-kpi-title">{{ user_ns.admins }}</p></article>
+                <article class="admin-kpi-card"><p class="kpi-label">Bloqueados</p><p class="admin-kpi-title">{{ user_ns.blocked }}</p></article>
+                <article class="admin-kpi-card"><p class="kpi-label">Fraudes altos acumulados</p><p class="admin-kpi-title">{{ user_ns.fraudes }}</p></article>
+            </section>
+            <article class="panel-card table-panel">
+                {% if notice %}<p class="status">{{ notice }}</p>{% endif %}
+                <div class="table-wrap">
+                    <table class="history-table logs-table">
+                        <thead><tr><th scope="col">Usuario</th><th scope="col">Rol</th><th scope="col">Consultas</th><th scope="col">Fraudes altos</th><th scope="col">Bloqueado hasta</th><th scope="col">Acciones</th></tr></thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td data-label="Usuario">{{ user.username }}</td>
+                                <td data-label="Rol">{{ user.role }}</td>
+                                <td data-label="Consultas">{{ user.total_consultas }}</td>
+                                <td data-label="Fraudes altos">{{ user.fraudes_altos }}</td>
+                                <td data-label="Bloqueado hasta">{{ user.blocked_until_fmt if user.blocked_until_fmt else 'Activo' }}</td>
+                                <td data-label="Acciones">
+                                    <div class="user-actions-stack">
+                                        <form method="post" class="inline-admin-form inline-admin-form-role">
+                                            <input type="hidden" name="action" value="change_role"><input type="hidden" name="user_id" value="{{ user.id }}">
+                                            <select name="new_role"><option value="analista" {% if user.role == 'analista' %}selected{% endif %}>Analista</option><option value="administrador" {% if user.role == 'administrador' %}selected{% endif %}>Administrador</option></select>
+                                            <button type="submit">Guardar rol</button>
+                                        </form>
+                                        <form method="post" class="inline-admin-form"><input type="hidden" name="action" value="block_30m"><input type="hidden" name="user_id" value="{{ user.id }}"><button type="submit" class="btn-admin-warn">Bloquear 30m</button></form>
+                                        <form method="post" class="inline-admin-form"><input type="hidden" name="action" value="unblock"><input type="hidden" name="user_id" value="{{ user.id }}"><button type="submit" class="btn-admin-ok">Desbloquear</button></form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+            {% elif page == 'model_management' %}
+            <section class="admin-kpi-grid admin-kpi-grid-3">
+                <article class="admin-kpi-card"><p class="kpi-label">Modelo activo</p><p class="admin-kpi-title">LightGBM</p></article>
+                <article class="admin-kpi-card"><p class="kpi-label">Modelos evaluados</p><p class="admin-kpi-title">{{ model_catalog|length }}</p></article>
+                <article class="admin-kpi-card admin-kpi-card-gear"><p class="kpi-label">Estado</p><p class="admin-kpi-title">🟢 Sistema en operación</p></article>
+            </section>
+            <article class="panel-card config-panel">
+                {% if notice %}<p class="status">{{ notice }}</p>{% endif %}
+            </article>
+            <article class="panel-card model-compare-panel">
+                <div class="panel-head"><p class="eyebrow">COMPARACIÓN</p><p class="panel-title">Comparativo guiado del desempeño</p></div>
+                <div class="model-compare-grid">
+                    {% for model_item in model_ranking %}
+                    <article class="metric-card model-rank-card {% if model_item.is_best %}model-rank-best{% elif model_item.is_active %}model-rank-active{% else %}model-rank-other{% endif %}">
+                        {% if model_item.is_best %}
+                            <p class="model-rank-badge">🏆 Mejor modelo</p>
+                            <p class="kpi-label">🟢 {{ model_item.label }} (destacado)</p>
+                        {% elif model_item.is_active %}
+                            <p class="model-rank-badge">🔵 Modelo activo</p>
+                            <p class="kpi-label">{{ model_item.label }}</p>
+                        {% else %}
+                            <p class="model-rank-badge">⚪ Modelo evaluado</p>
+                            <p class="kpi-label">{{ model_item.label }}</p>
+                        {% endif %}
+                        <p class="metric-value">AUC {{ model_item.auc_roc }}</p>
+                        <p class="subtitle">Accuracy: {{ model_item.accuracy }}%</p>
+                    </article>
+                    {% endfor %}
+                </div>
+                <p class="status model-compare-conclusion">{{ comparison_conclusion }}</p>
+                <div class="model-compare-actions">
+                    <a class="secondary-button model-details-link" href="{{ url_for('model_metrics_page') }}">Ver detalles del modelo</a>
+                </div>
+            </article>
+            {% elif page == 'data_management' %}
+            <section class="admin-kpi-grid">
+                <article class="admin-kpi-card"><p class="kpi-label">Registros de consultas</p><p class="admin-kpi-title">{{ data_stats.total_consultas }}</p></article>
+                <article class="admin-kpi-card"><p class="kpi-label">Fraudes altos</p><p class="admin-kpi-title">{{ data_stats.fraudes_altos }}</p></article>
+                <article class="admin-kpi-card"><p class="kpi-label">Eventos de log</p><p class="admin-kpi-title">{{ data_stats.total_logs }}</p></article>
+                <article class="admin-kpi-card"><p class="kpi-label">Última operación</p><p class="admin-kpi-title">{{ data_stats.last_data_event }}</p></article>
+            </section>
+
+            <article class="panel-card config-panel">
+                <div class="panel-head"><p class="eyebrow">ESTADO DEL MONTAJE</p><p class="panel-title">Último dataset montado</p></div>
+                {% if last_dataset_mount %}
+                    <p class="status"><strong>Montado en:</strong> tabla {{ last_dataset_mount.target_table }}</p>
+                    <p class="subtitle"><strong>Archivo:</strong> {{ last_dataset_mount.file_name }}</p>
+                    <p class="subtitle"><strong>Fecha:</strong> {{ last_dataset_mount.uploaded_at }}</p>
+                    <p class="subtitle"><strong>Usuario:</strong> {{ last_dataset_mount.uploaded_by }}</p>
+                    <p class="subtitle"><strong>Resultado:</strong> {{ last_dataset_mount.records_imported }} importados / {{ last_dataset_mount.records_skipped }} omitidos</p>
+                {% else %}
+                    <p class="subtitle">Aún no hay datasets montados.</p>
+                {% endif %}
+            </article>
+
+            <section class="panel-grid">
+                <article class="panel-card config-panel">
+                    <div class="panel-head"><p class="eyebrow">SUBIR DATASETS</p><p class="panel-title">Carga masiva desde CSV</p></div>
+                    {% if notice %}<p class="status">{{ notice }}</p>{% endif %}
+                    {% if error %}<p class="status error-status">{{ error }}</p>{% endif %}
+                    <form method="post" enctype="multipart/form-data" class="form-grid dashboard-form">
+                        <input type="hidden" name="action" value="upload_dataset">
+                        <p class="status">Evaluación inicial fija en LightGBM.</p>
+                        <label for="dataset_file">Archivo CSV</label>
+                        <input id="dataset_file" name="dataset_file" type="file" accept=".csv,text/csv" required>
+                        <p class="subtitle">Columnas aceptadas: monto o monto_usd, hora o hora_transaccion, tipo_comercio o categoria_comercio, metodo_pago o tipo_transaccion, ubicacion o ciudad, y frecuencia o es_fraude.</p>
+                        <button type="submit">Subir dataset</button>
+                    </form>
+                </article>
+
+                <article class="panel-card config-panel">
+                    <div class="panel-head"><p class="eyebrow">LIMPIAR REGISTROS</p><p class="panel-title">Depuración de datos históricos</p></div>
+                    <form method="post" class="form-grid dashboard-form">
+                        <input type="hidden" name="action" value="clean_records">
+                        <label for="target_table">Alcance de limpieza</label>
+                        <select id="target_table" name="target_table" required>
+                            <option value="consultas">Solo consultas</option>
+                            <option value="logs">Solo logs</option>
+                            <option value="all">Consultas y logs</option>
+                        </select>
+                        <label for="older_than_days">Eliminar registros más antiguos que</label>
+                        <select id="older_than_days" name="older_than_days" required>
+                            <option value="0">Todo el historial</option>
+                            <option value="30">30 días</option>
+                            <option value="90">90 días</option>
+                            <option value="180">180 días</option>
+                        </select>
+                        <button type="submit" class="btn-admin-warn">Limpiar registros</button>
+                    </form>
+                </article>
+            </section>
+
+            <article class="panel-card table-panel">
+                <div class="panel-head"><p class="eyebrow">EXPORTAR DATOS</p><p class="panel-title">Descargas para auditoría y respaldo</p></div>
+                <div class="quick-links-grid">
+                    <a class="quick-link-card" href="{{ url_for('export_data_consultas_csv') }}">⬇ Exportar consultas (CSV)</a>
+                    <a class="quick-link-card" href="{{ url_for('export_data_logs_csv') }}">⬇ Exportar logs (CSV)</a>
+                </div>
+                <p class="subtitle">Último evento: {{ data_stats.last_data_message }}</p>
+            </article>
+
+            <article class="panel-card table-panel">
+                <div class="panel-head"><p class="eyebrow">HISTORIAL DE MONTAJES</p><p class="panel-title">Últimas cargas de datasets</p></div>
+                {% if dataset_upload_history and dataset_upload_history|length > 0 %}
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Archivo</th>
+                                    <th>Destino</th>
+                                    <th>Importados</th>
+                                    <th>Omitidos</th>
+                                    <th>Usuario</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in dataset_upload_history %}
+                                <tr>
+                                    <td data-label="Fecha">{{ item.uploaded_at }}</td>
+                                    <td data-label="Archivo">{{ item.file_name }}</td>
+                                    <td data-label="Destino">{{ item.target_table }}</td>
+                                    <td data-label="Importados">{{ item.records_imported }}</td>
+                                    <td data-label="Omitidos">{{ item.records_skipped }}</td>
+                                    <td data-label="Usuario">{{ item.uploaded_by }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="subtitle">Sin historial de montajes todavía.</p>
+                {% endif %}
+            </article>
+            {% elif page == 'about' %}
+            <section class="about-grid">
+                <article class="panel-card about-card about-card-wide about-hero-card">
+                    <div class="about-hero-top">
+                        <span class="about-icon-badge"><i class="bi bi-shield-check"></i></span>
+                        <div>
+                            <p class="eyebrow">QUÉ HACE LA APP</p>
+                            <p class="panel-title">SIMDF: Detección inteligente de fraude en tiempo real</p>
+                        </div>
+                    </div>
+                    <p class="about-text about-lead">
+                        SIMDF centraliza evaluación de riesgo, trazabilidad, explicabilidad y operación administrativa
+                        para que tu equipo tome decisiones rápidas, seguras y auditables.
+                    </p>
+                    <div class="about-pill-row">
+                        <span class="about-pill"><i class="bi bi-cpu"></i> Modelos de ML</span>
+                        <span class="about-pill"><i class="bi bi-graph-up-arrow"></i> Métricas y performance</span>
+                        <span class="about-pill"><i class="bi bi-search-heart"></i> Explicabilidad</span>
+                        <span class="about-pill"><i class="bi bi-shield-lock"></i> Gestión segura</span>
+                    </div>
+                    <div class="about-stats-grid">
+                        <div class="about-stat-item"><p>Modelos disponibles</p><strong>3</strong></div>
+                        <div class="about-stat-item"><p>Módulos principales</p><strong>8+</strong></div>
+                        <div class="about-stat-item"><p>Enfoque operativo</p><strong>24/7</strong></div>
+                    </div>
+                </article>
+
+                <article class="panel-card about-card">
+                    <div class="panel-head">
+                        <p class="eyebrow">QUIÉN LA DESARROLLÓ</p>
+                        <p class="panel-title">Equipo SIMDF</p>
+                    </div>
+                    <p class="about-text">
+                        Solución diseñada por un equipo multidisciplinario de analítica, ingeniería y seguridad,
+                        enfocada en entornos financieros con alto volumen transaccional.
+                    </p>
+                    <ul class="about-list">
+                        <li>Arquitectura: Flask + motor de evaluación de riesgo.</li>
+                        <li>Diseño UX: interfaz operativa con enfoque en productividad.</li>
+                        <li>Seguridad: trazabilidad de eventos y controles de acceso por roles.</li>
+                    </ul>
+                </article>
+
+                <article class="panel-card about-card">
+                    <div class="panel-head">
+                        <p class="eyebrow">CONTACTO</p>
+                        <p class="panel-title">Canales de soporte</p>
+                    </div>
+                    <div class="about-contact-list">
+                        <p><i class="bi bi-envelope"></i> soporte@simdf.local</p>
+                        <p><i class="bi bi-telephone"></i> +57 601 555 0199</p>
+                        <p><i class="bi bi-clock"></i> Lunes a viernes, 8:00 a 18:00</p>
+                    </div>
+                    <div class="about-contact-actions">
+                        <a class="back-link" href="mailto:soporte@simdf.local"><i class="bi bi-send"></i> Escribir soporte</a>
+                        <a class="back-link" href="tel:+576015550199"><i class="bi bi-headset"></i> Llamar</a>
+                    </div>
+                </article>
+            </section>
+            {% endif %}
+        </section>
+    </section>
+</main>
+{% endif %}
+
+<footer class="app-footer">
+    <div class="app-footer__inner">
+        <p class="app-footer__item">
+            <i class="bi bi-c-circle"></i>
+            Copyright 2026 SIMDF. Todos los derechos reservados.
+        </p>
+        <p class="app-footer__item">
+            <i class="bi bi-tools"></i>
+            Tecnologías usadas: Python, Flask, SQLite, HTML, CSS, JavaScript, Bootstrap Icons, SweetAlert2.
+        </p>
+        <p class="app-footer__item">
+            <i class="bi bi-envelope-paper"></i>
+            Contacto: soporte@simdf.local | +57 601 555 0199
+        </p>
+    </div>
+</footer>
+
+<section id="notifyQueue" hidden>
+    {% if error %}
+        <div class="js-notify" data-type="error" data-message="{{ error|e }}"></div>
+    {% endif %}
+    {% if status_message %}
+        <div class="js-notify" data-type="success" data-message="{{ status_message|e }}"></div>
+    {% endif %}
+    {% if notice %}
+        <div class="js-notify" data-type="info" data-message="{{ notice|e }}"></div>
+    {% endif %}
+</section>
+
+<section class="support-widget" id="supportWidget">
+    <button class="support-toggle" id="supportToggle" type="button" aria-expanded="false" aria-controls="supportPanel">💬 Ayuda</button>
+    <article class="support-panel" id="supportPanel">
+        <header class="support-head"><p>Atención al Cliente</p><small>Bot SIMDF</small></header>
+        <div class="support-messages" id="supportMessages">
+            <div class="support-msg bot">
+                {% if page == 'new_transaction' %}
+                    Aquí puedes simular una nueva transacción y evaluar su riesgo.
+                {% elif page == 'history' %}
+                    Estás en el módulo de Historial. Aquí ves todas las evaluaciones guardadas.
+                {% elif page == 'model_metrics' %}
+                    Aquí puedes revisar la validación científica del modelo.
+                {% elif page == 'explainability' %}
+                    Esta sección explica por qué el modelo tomó su decisión.
+                {% elif page == 'result' %}
+                    Si necesitas interpretar este resultado, te explico cada sección.
+                {% else %}
+                    Hola. Soy tu asistente. Te ayudo a navegar en SIMDF.
+                {% endif %}
+            </div>
+        </div>
+        <div class="support-quick">
+            <button type="button" class="support-quick-btn" data-question="como analizar">¿Cómo analizar?</button>
+            <button type="button" class="support-quick-btn" data-question="ver historial">Ver historial</button>
+        </div>
+        <div class="support-input-wrap"><input id="supportInput" type="text" placeholder="Escribe tu duda..."><button id="supportSend" type="button">Enviar</button></div>
+    </article>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="{{ url_for('static', filename='js/ui-effects.js') }}"></script>
+<script src="{{ url_for('static', filename='js/support-bot.js') }}"></script>
+</body>
+</html>
