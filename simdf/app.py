@@ -2038,6 +2038,19 @@ def build_professional_pdf(report_data):
     commerce_chart.add(String(34, 120, "Concentracion de riesgo por tipo de comercio", fontName="Helvetica-Bold", fontSize=9))
     story.append(commerce_chart)
 
+    story.append(Spacer(1, 6))
+    story.append(Paragraph("Hallazgos Principales", section_style))
+    findings_text = f"Se identificaron <b>{report_data['riesgo_alto']} transacciones de alto riesgo</b> "
+    if report_data['riesgo_alto'] > 0:
+        findings_text += f"representando el <b>{(report_data['riesgo_alto']/report_data['total_consultas']*100):.1f}%</b> del volumen total. "
+    findings_text += f"El sistema mantiene un <b>riesgo promedio de {report_data['riesgo_promedio']:.1f}%</b> en las evaluaciones. "
+    if report_data['tasa_fraude'] > 10:
+        findings_text += f"<font color='#D9534F'><b>Atención:</b> La tasa de fraude actual ({report_data['tasa_fraude']:.1f}%) supera el 10%. Se recomienda escalación inmediata.</font>"
+    else:
+        findings_text += f"La tasa de fraude detectada es de <b>{report_data['tasa_fraude']:.1f}%</b>, manteniéndose dentro de parámetros normales de operación."
+    story.append(Paragraph(findings_text, body_style))
+    story.append(Spacer(1, 6))
+
     story.append(Paragraph("Top Factores de Riesgo", section_style))
     factors_rows = [["Factor", "Incidencia"]]
     for item in report_data["top_factors"]:
@@ -2057,6 +2070,9 @@ def build_professional_pdf(report_data):
         )
     )
     story.append(factors_table)
+    story.append(Spacer(1, 6))
+    story.append(Paragraph("<i>Análisis: Los factores enumerados representan los atributos de riesgo más frecuentes en las transacciones analizadas. Se sugiere priorizar controles en estas áreas.</i>", tiny_style))
+    story.append(Spacer(1, 10))
 
     story.append(Paragraph("Alertas Generadas", section_style))
     if report_data["alerts_rows"]:
@@ -2080,6 +2096,33 @@ def build_professional_pdf(report_data):
     else:
         story.append(Paragraph("No se registraron alertas de alto riesgo en el periodo filtrado.", body_style))
 
+    story.append(Spacer(1, 10))
+    story.append(Paragraph("Recomendaciones Estratégicas", section_style))
+    
+    recommendations = []
+    if report_data['tasa_fraude'] > 15:
+        recommendations.append("🔴 <b>Crítico:</b> Aumentar límites de revisión manual para transacciones de alto riesgo inmediatamente.")
+    elif report_data['tasa_fraude'] > 10:
+        recommendations.append("🟠 <b>Importante:</b> Monitorear tendencia de fraude detectado. Revisar casos de alto riesgo con especial atención.")
+    else:
+        recommendations.append("🟢 <b>Normal:</b> La detección de fraude se mantiene dentro de parámetros operacionales esperados.")
+    
+    if report_data['riesgo_alto'] > report_data['total_consultas'] * 0.2:
+        recommendations.append("• Implementar reglas adicionales para transacciones con monto mayor a USD 900.")
+    
+    if report_data['alertas_generadas'] > report_data['total_consultas'] * 0.15:
+        recommendations.append("• Revisar calibración del modelo - la proporción de alertas es elevada.")
+    
+    if report_data['precision_modelo'] < 90:
+        recommendations.append("• Considerar retrenar el modelo con datos más recientes para mejorar precisión.")
+    
+    recommendations.append("• Implementar revisión de casos de riesgo alto dentro de las primeras 24 horas.")
+    recommendations.append("• Mantener seguimiento de patrones por hora y tipo de comercio para identificar anomalías.")
+    
+    for rec in recommendations:
+        story.append(Paragraph(rec, body_style))
+    
+    story.append(Spacer(1, 10))
     story.append(PageBreak())
 
     story.append(Paragraph("Tabla de Transacciones Analizadas", section_style))
@@ -2122,10 +2165,43 @@ def build_professional_pdf(report_data):
         )
     )
     story.append(tx_table)
+    story.append(Spacer(1, 12))
+    
+    story.append(Paragraph("Conclusiones y Próximos Pasos", section_style))
+    conclusion_text = f"El análisis de {report_data['total_consultas']} transacciones durante el período {report_data['periodo_reporte'].lower()} "
+    conclusion_text += f"ha permitido identificar {report_data['riesgo_alto']} eventos de alto riesgo. "
+    conclusion_text += f"La eficacia del modelo <b>{report_data['modelo_utilizado']}</b> se refleja en una precisión del <b>{report_data['precision_modelo']}%</b> "
+    conclusion_text += f"y un AUC-ROC de <b>{report_data['auc_modelo']}</b>.\n\n"
+    conclusion_text += f"<b>Estado Operacional:</b> El sistema de monitoreo continúa funcionando dentro de los parámetros esperados. "
+    conclusion_text += f"Se recomienda mantener la vigilancia activa de los factores de riesgo identificados y ejecutar las acciones recomendadas.\n\n"
+    conclusion_text += f"<b>Próximas Acciones:</b> Revisar manualmente las {len(report_data['alerts_rows'])} alertas generadas, "
+    conclusion_text += f"validar las clasificaciones de riesgo y documentar cualquier caso que requiera escalación."
+    
+    story.append(Paragraph(conclusion_text, body_style))
+    story.append(Spacer(1, 8))
+    
+    footer_table = Table(
+        [[Paragraph("<b>Información Técnica</b><br/>Modelo: LightGBM<br/>Precision: " + str(report_data['precision_modelo']) + "%<br/>Recall: " + str(report_data['recall_modelo']) + "%<br/>F1-Score: " + str(report_data['f1_modelo']) + "%", tiny_style),
+          Paragraph("<b>Confiabilidad</b><br/>AUC-ROC: " + str(report_data['auc_modelo']) + "<br/>Transacciones: " + str(report_data['total_consultas']) + "<br/>Fraudes detectados: " + str(report_data['fraude_detectado']) + "<br/>Tasa: " + f"{report_data['tasa_fraude']:.1f}%", tiny_style)]],
+        colWidths=[85 * mm, 85 * mm],
+    )
+    footer_table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F0F3F7")),
+                ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#B8C9DD")),
+                ("LEFTPADDING", (0, 0), (-1, -1), 6),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+            ]
+        )
+    )
+    story.append(footer_table)
     story.append(Spacer(1, 8))
     story.append(
         Paragraph(
-            "SIMDF - Reporte tecnico autogenerado para seguimiento de riesgo transaccional. Universidad XXXXX - 2026.",
+            "SIMDF - Reporte Ejecutivo de Riesgo Transaccional | Autogenerado para análisis y toma de decisiones. Universidad XXXXX - 2026.",
             tiny_style,
         )
     )
